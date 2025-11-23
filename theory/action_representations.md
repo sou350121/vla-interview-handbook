@@ -1,0 +1,87 @@
+# 动作生成范式详解 (Action Representations & Generation)
+
+在 VLA 模型中，"如何输出动作" 是一个核心设计选择。本章详细对比三种主流的动作生成范式：**离散化 (Discrete Tokenization)**、**扩散策略 (Diffusion Policy)** 和 **流匹配 (Flow Matching)**。
+
+## 1. 离散化 (Discrete Tokenization)
+> **代表模型**: **RT-1**, **RT-2**, **Gato**
+
+### 核心思想
+将连续的物理动作 (如关节角度、末端坐标) 离散化为整数 Token，从而可以使用标准的 Transformer (分类任务) 进行预测。
+
+### 数学公式
+假设动作 $a \in [min, max]$，我们将其划分为 $N$ 个区间 (Bins)。
+$$
+Token = \text{round}\left( \frac{a - min}{max - min} \times (N - 1) \right)
+$$
+- **RT-1**: 使用 $N=256$。
+- **预测**: 模型输出一个 Logits 向量 $z \in \mathbb{R}^N$，通过 Softmax 得到概率分布：
+$$
+P(Token = i) = \frac{e^{z_i}}{\sum_{j=0}^{N-1} e^{z_j}}
+$$
+
+### 优缺点
+- **优点**:
+    - **多模态分布 (Multimodal)**: 可以很好地建模"向左走或向右走" (双峰分布)，而不会输出中间的平均值 (撞墙)。
+    - **架构统一**: 可以直接复用 LLM 的 Cross-Entropy Loss。
+- **缺点**:
+    - **精度损失**: 丢失了 Bin 内部的精度。对于高精度装配任务，256 个 Bin 可能不够。
+    - **高频抖动**: 预测结果在相邻 Bin 之间跳变会导致动作不平滑。
+
+---
+
+## 2. 扩散策略 (Diffusion Policy)
+> **代表模型**: **Octo**, **MimicGen**, **Toyota HPT**
+
+### 核心思想
+将动作生成建模为从高斯噪声中 **去噪 (Denoising)** 的过程。
+
+### 数学公式
+- **前向过程 (加噪)**:
+$$
+q(x_t | x_0) = \mathcal{N}(x_t; \sqrt{\bar{\alpha}_t} x_0, (1 - \bar{\alpha}_t) I)
+$$
+- **逆向过程 (去噪)**:
+模型 $\epsilon_\theta(x_t, t, \text{cond})$ 预测噪声，从而逐步还原动作：
+$$
+x_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \epsilon_\theta(x_t, t, \text{cond}) \right) + \sigma_t z
+$$
+
+### 优缺点
+- **优点**:
+    - **高精度**: 输出是连续值，没有离散化误差。
+    - **多模态**: 天然支持多解分布 (Multimodal Distribution)。
+    - **稳定性**: 相比 GAN，训练更稳定。
+- **缺点**:
+    - **推理慢**: 需要迭代去噪 (通常 50-100 步)，导致推理延迟高 (Latency)，难以用于高频控制 (如 >50Hz)。
+
+---
+
+## 3. 流匹配 (Flow Matching)
+> **代表模型**: **Pi0 (Physical Intelligence)**
+
+### 核心思想
+学习一个 **确定性的向量场 (Vector Field)**，将噪声分布平滑地变换为数据分布。
+
+### 与 Diffusion 的对比
+- **Diffusion**: 走的是随机游走 (Stochastic) 的去噪路径。
+- **Flow Matching**: 走的是 **直线 (Straight)** 路径 (Optimal Transport)。
+
+### 优缺点
+- **优点**:
+    - **极速推理**: 由于轨迹是直的，ODE 求解器只需要很少的步数 (e.g., 1-10 步) 就能得到高质量结果。
+    - **高频控制**: 使得大模型也能跑在 50Hz+ 的控制频率上。
+- **缺点**:
+    - **训练复杂**: 数学理论相对较新，训练稳定性需要技巧。
+
+---
+
+## 总结对比 (Comparison)
+
+| 范式 | 代表模型 | 输出类型 | 推理速度 | 精度 | 多模态支持 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Discrete Tokenization** | RT-1, RT-2 | 整数 Token | 快 (1步) | 低 (受限于 Bin) | 支持 |
+| **Diffusion Policy** | Octo | 连续浮点数 | 慢 (50+步) | 高 | 支持 |
+| **Flow Matching** | Pi0 | 连续浮点数 | 极快 (1-10步) | 高 | 支持 |
+
+> **面试 Tip**: 如果面试官问 "为什么现在的 VLA 模型开始从 Tokenization 转向 Diffusion/Flow?"
+> **答**: 为了追求**高精度操作** (如穿针、装配)。Tokenization 在处理这种任务时，量化误差是致命的，而 Diffusion/Flow 提供了连续空间的精细控制能力。

@@ -1,0 +1,67 @@
+# Pi 0.5 模型解剖 (Dissecting π0.5)
+
+> **发布时间**: 2025年4月
+> **核心定位**: 从"多面手" (Generalist) 进化为"探险家" (Open-World Explorer)。
+
+π0.5 是 Physical Intelligence 在 π0 基础上的重大迭代，旨在解决机器人学习中最大的痛点：**泛化到从未见过的环境 (Open-World Generalization)**。
+
+## 1. 核心架构：统一模型 (The Unified Model)
+
+### 1.1 "自言自语" 的大脑
+传统的机器人系统通常是分层的：
+- High-level Planner (LLM): "去把苹果拿起来" -> 输出坐标。
+- Low-level Controller (Policy): 根据坐标执行动作。
+
+**π0.5 打破了这种边界**。它是一个端到端的 VLA，但引入了 **Hierarchical Inference (分层推理)** 机制。
+- **输入**: 图像 + 语言指令。
+- **中间输出 (Latent Thought)**: 模型首先在内部生成一个高层的语义子任务 (Semantic Subtask)，例如 "Approach the handle" (靠近把手)。
+- **最终输出 (Action)**: 基于这个子任务，生成具体的电机控制信号 (Flow Matching)。
+
+这种机制让模型具备了**可解释性**和**长期规划能力**。它不仅仅是在模仿动作，而是在理解"意图"。
+
+### 1.2 混合架构 (Hybrid Architecture)
+为了平衡推理效率和控制精度，π0.5 采用了一种混合策略：
+- **Pre-training (预训练)**: 使用 **FAST Tokenizer** (离散化) 进行大规模预训练。离散 Token 训练速度快，容易扩展到海量数据。
+- **Inference (推理)**: 在最后一步使用 **Flow Matching** (连续化) 进行微调和生成。
+- **优势**: 既享受了 Tokenization 的训练效率，又保留了 Flow Matching 的控制平滑度。
+
+## 2. 训练数据的艺术 (Data Strategy)
+
+π0.5 的强大泛化能力来自于其独特的训练数据配比。
+
+### 2.1 异构数据 Co-training
+它不再仅仅依赖机器人数据 (Robot Data)，而是混合了三种数据源：
+1.  **Robot Data (OXE + 自研)**: 高质量，含动作标签。用于学习物理控制。
+2.  **Internet Videos (YouTube)**: 海量，无动作标签。用于学习"世界模型" (World Model) —— 知道物体被推会动，水倒出来会流。
+3.  **Simulation Data**: 完美标注，但有 Reality Gap。用于学习长序列逻辑。
+
+### 2.2 Cross-Embodiment Alignment (跨形态对齐)
+π0.5 能够控制双臂机器人、移动底盘、甚至四足机器人。
+- **统一动作空间**: 将不同机器人的动作映射到一个共享的 **Latent Action Space**。
+- **效果**: 你在一个单臂机器人上训练的"抓杯子"技能，可以 Zero-shot 迁移到双臂机器人上 (只需微调少量参数)。
+
+## 3. 核心能力突破 (Capabilities)
+
+### 3.1 开放世界泛化 (Open-World Generalization)
+- **场景**: 把机器人扔到一个从未见过的厨房 (Airbnb)。
+- **表现**: π0.5 能够识别出从未见过的咖啡机型号，并根据通用的"按按钮"知识尝试操作，而不是因为纹理不同而死机。
+- **原理**: 这种能力来自于 VLM Backbone (3B -> 5B) 强大的视觉语义理解能力。
+
+### 3.2 长序列任务 (Long-Horizon Tasks)
+- **任务**: "把桌子收拾干净" (Bus the table)。
+- **分解**: 
+    1. 识别所有垃圾。
+    2. 规划顺序 (先拿大的，再擦水的)。
+    3. 执行动作。
+- **提升**: 相比 π0，π0.5 在这种多阶段任务上的成功率提升了 40% 以上。
+
+## 4. 与 π0 和 π0.6 的对比
+
+| 特性 | π0 (Base) | π0.5 (Explorer) | π0.6 (Master) |
+| :--- | :--- | :--- | :--- |
+| **核心关注** | 基础控制，物理理解 | **环境泛化，分层推理** | 极致熟练度，自我进化 |
+| **架构** | Flow Matching | **Unified (FAST + Flow)** | Unified + **Action Expert** |
+| **训练方式** | BC (模仿学习) | **Co-training (Web + Sim)** | **Offline RL (Recap)** |
+| **适用场景** | 固定环境重复操作 | **新环境探索，家务** | 工厂流水线，高精度装配 |
+
+> **面试 Tip**: 如果被问到 π0.5 的创新点，重点答 **"Hierarchical Inference" (分层推理)** 和 **"Open-world Generalization" (开放世界泛化)**。它是连接"通识大模型"和"物理执行器"的关键桥梁。

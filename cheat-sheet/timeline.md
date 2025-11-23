@@ -22,9 +22,9 @@
 | **2024.06** | **OpenVLA** | Stanford | **开源 SOTA**。基于 Llama 2 + SigLIP，支持量化部署，社区活跃度极高。 |
 | **2024.10** | **π0 (Pi-Zero)** | Physical Intelligence | 强调物理世界理解的基础模型，Flow Matching Action Decoder。**已开源**。 |
 | **2024.12** | **MultiBotGPT** | - | 多机器人协作控制，LLM 作为调度中心。 |
-| **2025.02** | **π0.5** | Physical Intelligence | **Open-world Generalization**。大规模异构数据 (Cross-Embodiment) 对齐。 |
+| **2025.04** | **π0.5** | Physical Intelligence | **Open-world Generalization**。分层推理 (Hierarchical Inference)，统一高层规划与底层控制。 |
 | **2025.04** | **OpenVLA-OFT** | - | Online Fine-Tuning。提升了 OpenVLA 在新任务上的适应速度。 |
-| **2025.11** | **π0.6** | Physical Intelligence | **RL + Action Expert**。引入强化学习微调和专门的动作专家模块，解决精细操作难题。 |
+| **2025.11** | **π0.6 / π*0.6** | Physical Intelligence | **RL (Recap) + 5B Backbone**。引入 Offline RL 自我进化，长序列任务性能翻倍。 |
 
 ## 3. 综述 (Surveys)
 - **2025.01**: *Vision-Language-Action Models for Robotics: A Review Towards Real-World Applications* (IEEE Access)

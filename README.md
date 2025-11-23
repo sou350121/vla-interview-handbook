@@ -22,6 +22,7 @@
 
 ### 1. [理论基础 (Theory)](./theory/)
 - **VLA 核心架构**: RT-1, RT-2, OpenVLA, Octo, π0 (Pi-Zero).
+- **动作生成范式**: 离散化 (Tokenization) vs 扩散 (Diffusion) vs 流匹配 (Flow).
 - **多模态大模型**: CLIP, LLaVA, Flamingo 原理回顾.
 - **数据处理**: RLDS 格式, 异构数据 Co-training.
 

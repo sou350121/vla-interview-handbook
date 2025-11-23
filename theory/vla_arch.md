@@ -51,22 +51,21 @@
     - 可能采用了更高效的 Action Tokenizer，以适应高频控制需求。
 - **数据**: 混合了多种机器人的数据 (Arms, Quadrupeds, Humanoids)。
 
-### π0.5 (Pi-Zero-Point-Five)
-- **核心升级**: **Open-world Generalization** (开放世界泛化)。
-- **异构数据训练**:
-    - 引入了大量的互联网视频数据 (YouTube) 和模拟数据。
-    - 使用 **Cross-Embodiment Alignment** 技术，将不同机器人的动作空间对齐到统一的潜空间 (Latent Space)。
-- **能力**: 能够处理未见过的物体和场景，Sim-to-Real 能力显著增强。
+### π0.5 (Pi-Zero-Point-Five) - April 2025
+- **核心升级**: **Open-world Generalization** (开放世界泛化) 与 **Hierarchical Inference** (分层推理)。
+- **架构特点**:
+    - **统一模型 (Unified Model)**: 同时负责高层语义规划 (Subtask Prediction) 和底层电机控制 (Motor Control)。模型"自言自语"下一步要做什么，然后执行。
+    - **异构数据训练**: 引入了大量的互联网视频数据 (YouTube) 和模拟数据，通过 Co-training 实现对新环境 (如从未见过的厨房) 的适应。
+    - **混合架构**: 预训练阶段可能使用离散 Token (FAST tokenizer) 以提高效率，推理阶段使用 Flow Matching 生成连续动作。
 
-### π0.6 (Pi-Zero-Point-Six)
-- **核心升级**: **RL (Reinforcement Learning) 强化** 与 **Action Expert**。
-- **Backbone**: 升级为 **Gemma 3** (Google 最新开源模型) 作为语言基座，增强了指令遵循和推理能力。
-- **Action Expert**:
-    - 引入了专门的 "Action Expert" 模块（可能是 Mixture-of-Experts, MoE 架构），专门处理精细操作。
-    - 解决了大语言模型在精细运动控制上的 "手笨" 问题。
-- **RLHF for Robotics**:
-    - 使用人类反馈 (Human Feedback) 或 成功/失败 信号进行强化学习微调。
-    - 显著提升了长序列任务的成功率。
+### π0.6 & π*0.6 (Pi-Star) - November 2025
+- **核心升级**: **RL (Reinforcement Learning) 强化** 与 **Recap 算法**。
+- **Backbone**: 升级为 **5B Parameter VLM**，增强了对复杂指令和环境的理解。
+- **π*0.6 (Pi-Star)**:
+    - **Recap 算法**: 一种 Offline RL 方法。模型通过"复盘" (Recap) 过去的成功与失败经验进行自我提升，而不仅仅是模仿 (BC)。
+    - **性能飞跃**: 在长序列任务 (如折叠衣物、组装纸箱) 上，吞吐量翻倍，失败率降低 2x。
+    - **Self-Improvement**: 具备在真机运行中持续学习的能力。
+- **Action Expert**: 引入了专门的动作专家模块，专门处理精细操作，解决了大语言模型在精细运动控制上的"手笨"问题。
 
 ## 5. 模型对比总结 (Model Comparison)
 

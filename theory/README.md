@@ -7,7 +7,10 @@
     - RT-1, RT-2
     - OpenVLA, Octo
     - **Physical Intelligence (Pi) Models (π0, π0.5, π0.6)**
-    - **[Pi0 代码解构 (Flow Matching)](./pi0_flow_matching.md)** [New]
+    - **[Pi0 代码解构 (Flow Matching)](./pi0_flow_matching.md)**
+    - **[Pi0.5 模型解剖 (Unified Model & Generalization)](./pi0_5_dissection.md)**
+    - **[Pi0.6 模型解剖 (Recap RL & Self-Improvement)](./pi0_6_dissection.md)** [New]
+    - **[动作生成范式对比 (Tokenization vs Diffusion vs Flow)](./action_representations.md)** [New]
 2. **[数据处理 (Data Processing)](./data.md)**
     - RLDS 格式详解
     - 数据加权与平衡策略
