@@ -6,18 +6,21 @@
 1. **[硬件选型与成本 (Hardware & Pricing)](./hardware.md)**
     - 灵巧手 (Dexterous Hands) 选型指南
     - 机械臂与移动底盘
-2. **[Pi0 真机部署 (Pi0 Deployment)](./pi0_deployment.md)** [New]
+2. **[相机标定 (Camera Calibration)](./calibration.md)** [New]
+    - Eye-in-Hand vs Eye-to-Hand
+    - Aruco 标定实战
+3. **[Pi0 真机部署 (Pi0 Deployment)](./pi0_deployment.md)**
     - 官方 OpenPI 架构
     - 硬件要求 (4090 vs Orin)
     - Remote Inference 架构
-3. **[灵巧手部署实战 (Dexterous Hand Guide)](./dexterous_hand_guide.md)**
+4. **[灵巧手部署实战 (Dexterous Hand Guide)](./dexterous_hand_guide.md)**
     - 通讯架构 (CANFD, EtherCAT)
     - 软件栈 (Retargeting, Teleop)
     - 真实案例 (线缆管理, 散热)
-4. **[模型优化与边缘部署 (Optimization)](./optimization.md)**
+5. **[模型优化与边缘部署 (Optimization)](./optimization.md)**
     - 量化 (Quantization): GPTQ, AWQ
     - 边缘推理: TensorRT-LLM, vLLM
-3. **[Sim-to-Real (仿真到真机)](./sim_to_real.md)**
+6. **[Sim-to-Real (仿真到真机)](./sim_to_real.md)**
     - Domain Randomization
     - Reality Gap 应对策略
 

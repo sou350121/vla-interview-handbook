@@ -36,7 +36,11 @@ Pi0 极其依赖多视角视觉输入。标准的官方推荐配置是 **4-Camer
     - **连接**: 通过千兆以太网 (LAN) 连接机器人。
 
 - **小脑 (Client)**: 机载电脑 (Onboard Computer)
-    - **设备**: **Intel NUC** 或 **Jetson Orin**。
+    - **推荐型号**: **Intel NUC 12/13 Pro (i7 版本)** 或 **Jetson Orin AGX (64GB)**。
+    - **配置要求**:
+        - **CPU**: i7-1260P 或更高 (需处理 4 路相机流编解码)。
+        - **RAM**: **32GB DDR4/DDR5** (16GB 勉强，32GB 稳妥)。
+        - **IO**: 必须有 **Thunderbolt 4** 或 USB 3.2 Gen 2 (用于扩展 PCIe 卡)。
     - **任务**: 读取相机数据，发送给 Server；接收 Action，控制电机。
     - **优势**: 机载电脑只需要负责 I/O，不需要跑大模型，大大降低了机载硬件成本和散热压力。
 
@@ -61,26 +65,67 @@ source .venv/bin/activate
 uv pip install -e .
 ```
 
-### 2.2 下载模型权重
-模型权重托管在 Hugging Face：
+### 2.2 下载模型权重 (Download Weights)
+
+模型权重托管在 Hugging Face，通常需要申请访问权限 (Gated Model)。
+
+#### 步骤 1: 准备 Hugging Face 账号与 Token
+1.  注册/登录 [Hugging Face](https://huggingface.co/)。
+2.  访问 `physical-intelligence/pi0` 模型页面，点击 **"Request Access"** 并同意用户协议。
+3.  进入 [Settings -> Access Tokens](https://huggingface.co/settings/tokens)。
+4.  点击 **"New token"**，创建一个类型为 `Read` 的 Token，并复制它 (以 `hf_` 开头)。
+
+#### 步骤 2: 命令行登录
+在终端中运行以下命令，粘贴刚才复制的 Token：
 
 ```bash
-# 需要先登录 Hugging Face
 huggingface-cli login
-
-# 下载 π0 Base 模型
-huggingface-cli download physical-intelligence/pi0 --local-dir checkpoints/pi0
+# 提示 "Token:" 时粘贴 (输入不会显示)，按回车。
+# 提示 "Add token as git credential?" 选 Y。
 ```
+
+#### 步骤 3: 下载模型
+推荐使用 `huggingface-cli` 下载，支持断点续传。
+
+```bash
+# 1. 安装 CLI 工具 (如果还没装)
+pip install -U "huggingface_hub[cli]"
+
+# 2. 下载 π0 Base 模型 (推荐下载到指定目录)
+huggingface-cli download physical-intelligence/pi0 \
+    --local-dir checkpoints/pi0 \
+    --resume-download
+
+# [可选] 如果只需要下载特定文件 (例如只下载权重，不下载 safe tensors)
+# huggingface-cli download physical-intelligence/pi0 --include "*.pt" --local-dir checkpoints/pi0
+```
+
+> **提示**: 模型文件较大 (约 6-10GB)，建议在 `screen` 或 `tmux` 会话中下载，防止网络中断。
 
 ## 3. 部署架构：Remote Inference (推荐)
 
 由于 Pi0 计算量较大，在机载电脑 (如 Orin) 上直接运行可能无法达到 50Hz 的控制频率。官方推荐 **Server-Client** 架构。
 
-### 3.1 架构图
+### 3.1 为什么不能直接在 Orin 上跑? (Why Server-Client?)
+- **算力瓶颈**: Pi0 是一个 **3B (30亿参数)** 的视觉语言模型。在 Jetson Orin 上推理一次可能需要 100ms+ (即 <10Hz)。
+- **控制要求**: 灵巧手等复杂机器人需要 **50Hz** (即 20ms 一次) 的控制频率才能保证动作流畅、不抖动。
+- **解决方案**: **"大脑-小脑" 分离 (Brain-Cerebellum Split)**。
+    - **大脑 (Server)**: 放在桌子下的高性能工作站 (RTX 4090)。负责"思考" (运行大模型)，算力无限。
+    - **小脑 (Client)**: 放在机器人肚子里的 Orin/NUC。负责"反射" (收发信号)，实时性强。
+    - **连接**: 两者通过 **千兆局域网 (Gigabit LAN)** 连接，延迟通常 <1ms，完全可以忽略。
+
+### 3.2 架构图 (Architecture)
 ```mermaid
 graph LR
-    Robot[机器人 (Client)] -- 图像/状态 (WebSocket) --> Server[高性能工作站 (Server)]
-    Server -- 动作 (50Hz) --> Robot
+    subgraph Robot [机器人端 (Client/Cerebellum)]
+        Camera[相机] --> |图像| Network
+        Network --> |动作| Motor[电机驱动]
+    end
+    
+    subgraph Workstation [工作站端 (Server/Brain)]
+        Network[局域网] --> |图像| Model[Pi0 Model (4090)]
+        Model --> |Action Chunk| Network
+    end
 ```
 
 ### 3.2 Server 端 (4090 工作站)
@@ -109,26 +154,53 @@ while True:
 
 ## 4. 微调工作流 (Fine-tuning Workflow)
 
-如果你需要让 Pi0 学会一个新技能 (例如：折叠一种从未见过的毛巾)，可以使用 LoRA 进行快速微调。
+> **注意**: 目前 OpenPI 主要支持 **Full Fine-tuning** (全量微调)。LoRA 支持尚在开发中。
 
-### 4.1 数据收集
-- **数据量**: 推荐 **1-20 小时** 的示范数据。
-- **格式**: 必须转换为 **RLDS (Reinforcement Learning Datasets)** 格式。
-- **工具**: 使用 `openpi` 提供的 `rlds_converter`。
+### 4.1 数据准备 (Data Preparation)
+Pi0 训练需要 **RLDS (Reinforcement Learning Datasets)** 格式的数据。
 
-### 4.2 启动训练
-使用 LoRA 配置文件启动训练：
+1.  **采集数据**: 使用 Teleoperation 采集机器人操作数据 (Images, Joint States, Actions)。
+2.  **转换为 RLDS**:
+    - OpenPI 没有一键转换脚本，需要基于 `tensorflow_datasets` (TFDS) 编写自定义 Builder。
+    - **核心步骤**:
+        1. 创建 `my_dataset_builder.py` 继承 `tfds.core.GeneratorBasedBuilder`。
+        2. 实现 `_info()` 定义数据结构 (Features: image, action, language)。
+        3. 实现 `_generate_examples()` 读取原始数据并生成样本。
+    - **构建**: 运行 `tfds build` 生成 TFRecord 文件。
 
-```bash
-python -m openpi.training.train \
-    --config configs/pi0_lora.yaml \
-    --data_path /path/to/your/rlds_data \
-    --exp_name fold_towel_experiment
+### 4.2 训练配置 (Training Configuration)
+修改 `configs/pi0_finetune.yaml` (或类似配置文件)：
+
+```yaml
+model:
+  type: "pi0"
+  # ... model params ...
+
+train:
+  batch_size: 8  # 根据显存调整 (A100 80G 可开大)
+  learning_rate: 1e-4
+  max_steps: 10000
+  save_interval: 1000
+
+dataset:
+  name: "my_custom_dataset"
+  data_dir: "/path/to/rlds_data"
 ```
 
-### 4.3 训练时间参考 (RTX 4090)
-- **1 小时数据**: 约 2-4 小时训练时间。
-- **10 小时数据**: 约 12-24 小时训练时间。
+### 4.3 启动训练 (Start Training)
+使用 `torchrun` 启动单机多卡训练：
+
+```bash
+torchrun --nproc_per_node=8 -m openpi.training.train \
+    --config configs/pi0_finetune.yaml \
+    --exp_name my_finetune_exp
+```
+
+### 4.4 评估与测试 (Evaluation)
+训练过程中会保存 Checkpoints。
+1.  **加载 Checkpoint**: 修改推理脚本指向新的 `model.pt`。
+2.  **真机测试**: 在机器人上运行相同的任务，观察成功率。
+    - *提示*: 也可以使用 `openpi` 的 Policy Evaluation 脚本在仿真环境中预测试 (如果有 Sim 环境)。
 
 ## 5. 常见问题 (FAQ)
 
@@ -180,3 +252,13 @@ python -m openpi.training.train \
     # Slave
     sensor.set_option(rs.option.inter_cam_sync_mode, 2)
     ```
+
+## 7. 相机标定 (Camera Calibration)
+
+> **重要**: 这是一个通用的部署步骤。请参考专门的 **[相机标定指南 (Camera Calibration Guide)](./calibration.md)**。
+
+它涵盖了：
+- **Eye-to-Hand** (High/Low Cam)
+- **Eye-in-Hand** (Wrist Cam)
+- **Aruco 标定流程**
+
