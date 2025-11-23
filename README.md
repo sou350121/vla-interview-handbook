@@ -22,11 +22,14 @@
 
 ### 1. [理论基础 (Theory)](./theory/)
 - **VLA 核心架构**: RT-1, RT-2, OpenVLA, Octo, π0 (Pi-Zero).
-- **动作生成范式**: 离散化 (Tokenization) vs 扩散 (Diffusion) vs 流匹配 (Flow).
+- **Pi 系列解剖**: [Pi0.5 (Unified Model)](./theory/pi0_5_dissection.md), [Pi0.6 (Recap RL)](./theory/pi0_6_dissection.md).
+- **动作生成范式**: [离散化 vs 扩散 vs 流匹配](./theory/action_representations.md).
 - **多模态大模型**: CLIP, LLaVA, Flamingo 原理回顾.
 - **数据处理**: RLDS 格式, 异构数据 Co-training.
 
 ### 2. [真机与部署 (Deployment)](./deployment/)
+- **Pi0 真机部署**: [硬件配置与 Remote Inference](./deployment/pi0_deployment.md).
+- **灵巧手实战**: [避坑指南 (通讯, 散热, 线缆)](./deployment/dexterous_hand_guide.md).
 - **模型优化**: 量化 (AWQ, GPTQ), 剪枝.
 - **边缘计算**: TensorRT, ONNX Runtime, vLLM 部署.
 - **Sim-to-Real**: Domain Randomization, 迁移学习.
