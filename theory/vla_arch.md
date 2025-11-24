@@ -52,6 +52,8 @@
 - **数据**: 混合了多种机器人的数据 (Arms, Quadrupeds, Humanoids)。
 
 ### π0.5 (Pi-Zero-Point-Five) - April 2025
+> **[Deep Dive: Pi0.5 模型解剖](./pi0_5_dissection.md)**
+
 - **核心升级**: **Open-world Generalization** (开放世界泛化) 与 **Hierarchical Inference** (分层推理)。
 - **架构特点**:
     - **统一模型 (Unified Model)**: 同时负责高层语义规划 (Subtask Prediction) 和底层电机控制 (Motor Control)。模型"自言自语"下一步要做什么，然后执行。
@@ -59,6 +61,8 @@
     - **混合架构**: 预训练阶段可能使用离散 Token (FAST tokenizer) 以提高效率，推理阶段使用 Flow Matching 生成连续动作。
 
 ### π0.6 & π*0.6 (Pi-Star) - November 2025
+> **[Deep Dive: Pi0.6 模型解剖](./pi0_6_dissection.md)**
+
 - **核心升级**: **RL (Reinforcement Learning) 强化** 与 **Recap 算法**。
 - **Backbone**: 升级为 **5B Parameter VLM**，增强了对复杂指令和环境的理解。
 - **π*0.6 (Pi-Star)**:
