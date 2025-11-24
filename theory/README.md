@@ -6,6 +6,7 @@
 1. **[VLA 核心架构 (VLA Core Architectures)](./vla_arch.md)**
     - RT-1, RT-2
     - OpenVLA, Octo
+    - **[Backbone 对比: Transformer vs CNN](./transformer_vs_cnn.md)** [New]
     - **Physical Intelligence (Pi) Models (π0, π0.5, π0.6)**
     - **[Pi0 代码解构 (Flow Matching)](./pi0_flow_matching.md)** (含 Time Embeddings, CFG, OT-CFM, ODE Solvers)
     - **[Pi0.5 模型解剖 (Unified Model & Generalization)](./pi0_5_dissection.md)**
