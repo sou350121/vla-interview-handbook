@@ -26,9 +26,32 @@ Flash Attention 通过 **分块 (Tiling)** 避免实际存储完整的 $QK^T$ �
 3. 使用 **在线 Softmax (Online Softmax)** 技术增量更新归一化。
 4. 最终合并结果，避免将中间结果写回 HBM (High Bandwidth Memory)。
 
-**关键技术**:
-- **Kernel Fusion**: 将 Softmax 和矩阵乘法融合为单个 CUDA Kernel，减少 HBM 访问。
-- **Recomputation**: 反向传播时重新计算注意力矩阵，而不是存储它。
+### 2.1 Kernel Fusion (算子融合): IO-Aware Computing
+Flash Attention 的核心洞察是：**Transformer 的瓶颈不在计算 (FLOPs)，而在显存读写 (HBM IO)**。
+
+-   **HBM vs SRAM**:
+    -   **HBM (High Bandwidth Memory)**: 显存，容量大 (24GB+)，但速度慢 (1-2 TB/s)。
+    -   **SRAM (L2 Cache)**: 片上缓存，容量小 (几十 MB)，但速度极快 (19 TB/s+)。
+-   **标准 Attention**: 需要多次读写 HBM。
+    1.  读 $Q, K$ -> 算 $S = QK^T$ -> 写回 HBM ($N^2$)。
+    2.  读 $S$ -> 算 $P = \text{softmax}(S)$ -> 写回 HBM ($N^2$)。
+    3.  读 $P, V$ -> 算 $O = PV$ -> 写回 HBM。
+-   **Flash Attention Fusion**:
+    -   将上述所有步骤融合进**同一个 CUDA Kernel**。
+    -   数据一旦从 HBM 加载到 SRAM，就在 SRAM 中完成 $QK^T$, Softmax, $PV$ 的所有计算，只把最终结果 $O$ 写回 HBM。
+    -   **结果**: HBM 读写量从 $O(N^2)$ 降低到 $O(N)$，尽管 FLOPs 没变，但端到端速度提升了 2-4 倍。
+
+### 2.2 Recomputation (重计算): 换取显存的艺术
+在训练时的反向传播 (Backward Pass) 中，通常需要保存前向传播的中间激活值 (Activations) 来计算梯度。
+
+-   **标准做法**: 保存巨大的 $N \times N$ 注意力矩阵 $P$。这直接导致了 OOM (Out of Memory)。
+-   **Flash Attention 做法**:
+    -   **不保存** $P$ 矩阵。
+    -   在反向传播时，利用保存在 SRAM 中的 $Q, K, V$ 块，**重新计算**一遍 Attention。
+-   **为什么更快?**
+    -   直觉上，重计算会增加 FLOPs，应该变慢。
+    -   但由于 Attention 是 **IO-Bound** (受限于带宽) 的，重计算带来的额外 FLOPs 开销，远小于从 HBM 读取巨大矩阵 $P$ 的时间开销。
+    -   **结论**: Recomputation 不仅省了显存，反而因为减少了 IO 而变快了。
 
 ### 数学推导：在线 Softmax
 
