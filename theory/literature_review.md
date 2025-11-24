@@ -12,6 +12,9 @@
     - **Transformer-based**: DiT (Diffusion Transformer)，适合长时序。
 - **Action Space**: **连续空间 (Continuous)**。无离散化误差，精度极高。
 - **Inference**: 迭代去噪。原始 DDPM 需 100 步，使用 **DDIM** 可加速至 10-15 步。
+- **Deep Dive**:
+    - **EBM 视角**: Diffusion 实际上是在学习能量地貌 (Energy Landscape)，相比 MSE 的单峰平均，它能捕捉多模态分布 (Multimodal Distribution)。
+    - **Conditioning**: 通过 **FiLM** 层将语言/图像特征注入 U-Net。
 - **Key Contribution**: 首次将生成式 AI (Generative AI) 引入机器人控制，完美解决了多解问题，并在高精度任务 (如穿针) 上表现卓越。
 
 ## 2. RT-2 (Google DeepMind, 2023)
@@ -50,6 +53,9 @@
 - **Action Space**: **连续空间 (Continuous)**。
     - 不同于 RT-2/OpenVLA 的离散 Token，Pi0 输出连续动作，避免了量化误差。
 - **Inference**: 使用 ODE Solver (常微分方程求解器)。相比 Diffusion 的随机游走，Flow Matching 走直线，**1-10 步**即可生成高质量动作。
+- **Deep Dive**:
+    - **OT-CFM**: 基于 Optimal Transport 构造直线路径 (Wasserstein Geodesic)。
+    - **ODE Solver**: 训练时学习向量场，推理时使用 **Euler** (极速) 或 **Heun** (高精) 求解。
 - **Key Contribution**: 结合了 VLM 的语义理解和 Flow Matching 的高频精细控制，实现了"大脑"与"小脑"的统一。
 
 ## 总结对比表 (Summary Table)

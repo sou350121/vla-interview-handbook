@@ -10,9 +10,11 @@ Physical Intelligence 的 π0 模型核心在于引入了 **Flow Matching** 来�
 不同于 Diffusion Model 学习去噪过程 (Denoising Score Matching)，Flow Matching 直接学习一个 **确定性的常微分方程 (ODE)**，定义了概率密度路径 $p_t(x)$ 如何随时间 $t$ 演变。
 
 我们定义一个 **向量场 (Vector Field)** $v_t(x)$，它描述了样本在时间 $t$ 的移动速度和方向。
+
 $$
 \frac{dx}{dt} = v_t(x)
 $$
+
 - $x_0$: 真实数据分布 (Real Data, e.g., 机器人的正确动作)。
 - $x_1$: 标准高斯噪声分布 (Noise, $\mathcal{N}(0, I)$)。
 - **目标**: 找到一个向量场 $v_t$，使得当我们从噪声 $x_1$ 出发，沿着这个场逆流而上 (或顺流而下，取决于定义) 积分到 $t=0$ 时，能够精确地变回 $x_0$。
@@ -27,24 +29,30 @@ $$
 
 ### 2.1 线性插值路径 (Conditional Flow)
 为了训练模型，我们需要构造一个"正确答案"。假设我们已知一个真实样本 $x_0$ 和一个采样噪声 $x_1$，我们定义一条连接它们的直线路径：
+
 $$
 x_t = (1 - t)x_0 + t x_1, \quad t \in [0, 1]
 $$
+
 - 当 $t=0$ 时， $x_t = x_0$ (数据)。
 - 当 $t=1$ 时， $x_t = x_1$ (噪声)。
 
 ### 2.2 目标速度 (Target Velocity)
 对上面的路径 $x_t$ 对时间 $t$ 求导，得到该路径上的理想速度 $u_t(x|x_1)$：
+
 $$
 \frac{d}{dt} x_t = \frac{d}{dt} \left( (1 - t)x_0 + t x_1 \right) = x_1 - x_0
 $$
+
 - **物理含义**: 目标速度是一个恒定向量，方向从 $x_0$ 指向 $x_1$。这非常直观：要从数据变到噪声，就一直往噪声方向走；反之亦然。
 
 ### 2.3 损失函数 (Loss Function)
 我们训练一个神经网络 $v_\theta(x_t, t, \text{cond})$ 来拟合这个目标速度。这就是 **Conditional Flow Matching (CFM)** loss：
+
 $$
-\mathcal{L}(\theta) = \mathbb{E}_{t, x_0, x_1} \left[ \| v_\theta(x_t, t, \text{cond}) - (x_1 - x_0) \|^2 \right]
+\mathcal{L}(\theta) = \mathbb{E}_{t, x_0, x_1} \left[ \Vert v_\theta(x_t, t, \text{cond}) - (x_1 - x_0) \Vert^2 \right]
 $$
+
 - **输入**:
     - $x_t$: 当前时刻的插值状态 (混合了数据和噪声)。
     - $t$: 当前时间步。
@@ -204,4 +212,15 @@ def compute_loss(policy, vlm_cond, real_action):
     - 我们可以只跑 ODE 的 1 步 (Euler Step)，虽然精度略低，但速度极快，可以实现高频响应。
     - 也可以跑 10 步，获得高精度动作。
     - 这种 **Compute-Accuracy Trade-off** 是 Transformer 做不到的。
+
+### 6.3 为什么是直线? (Optimal Transport)
+- **Wasserstein Distance**: 在概率分布空间中，将一个分布搬运到另一个分布的"最小代价"路径就是直线 (Geodesic)。
+- **OT-CFM**: 我们构造的 $x_t = (1-t)x_0 + t x_1$ 正是 Optimal Transport 的位移插值 (Displacement Interpolation)。
+- **Rectified Flow**: 这与 Stable Diffusion 3 使用的 Rectified Flow 思想一致，旨在将弯曲的扩散路径"拉直"，从而允许极少步数的推理 (1-step generation)。
+
+### 6.4 ODE Solver 的选择
+- **Euler (1st order)**: 最简单，一步走到底。$x_{t+dt} = x_t + v_t dt$。速度最快，但误差最大。
+- **Midpoint / Heun (2nd order)**: 先试探性走半步，看斜率，再修正。精度更高，但需要 2 倍的 NFE (Number of Function Evaluations)。
+- **RK4 (4th order)**: 经典的高精度求解器，需要 4 倍 NFE。
+- **结论**: 在机器人控制中，通常使用 **Euler** (追求极速) 或 **Heun** (追求平衡)。由于 Flow Matching 训练出的向量场非常平滑 (直线)，Euler 方法通常已经足够好用。
 
