@@ -26,6 +26,37 @@
         2. **Domain Adaptation**: 使用 GAN 或特征对齐技术。
         3. **System Identification**: 辨识真机参数反馈给仿真。
 
+### Q4: Transformer vs CNN 在 VLA 中的选择：什么时候用 ViT，什么时候用 ResNet？
+- **参考答案**:
+    - **ViT (优选)**:
+        - **多模态统一**: 需要将视觉、语言、动作全部 Tokenize 并拼接 (e.g., RT-2, OpenVLA)。
+        - **全局上下文**: 需要理解画面中远距离的物体关系 (e.g., "桌子左边的杯子和右边的壶")。
+        - **Scaling Law**: 有大量数据时 ViT 效果更好。
+    - **ResNet (优选)**:
+        - **小样本**: 数据不足时 CNN 的归纳偏置有助于快速收敛。
+        - **纹理特征**: 需要高频细节（如 GelSight 触觉传感器）。
+        - **推理速度**: CNN 通常比 ViT 轻量，适合边缘设备。
+
+### Q5: 什么是触觉 VLA (Tactile VLA)？为什么视觉不够？
+- **参考答案**:
+    - **Tactile VLA**: 融合了触觉传感器 (e.g., GelSight) 的 VLA 模型，能够感知接触、材质、滑移等视觉无法获取的信息。
+    - **为什么视觉不够**:
+        1. **遇挡 (Occlusion)**: 机械手抓取时，手掌会挡住摄像头。
+        2. **物理属性**: 视觉无法直接判断软硬、摩擦力。
+        3. **微米级控制**: 触觉传感器提供更高精度的反馈。
+    - **代表模型**: VLA-Touch (2025), OmniVTLA (2025)。
+
+### Q6: VLA-Touch 和 OmniVTLA 有什么区别？
+- **参考答案**:
+    - **VLA-Touch**: 双层反馈机制。
+        - **High-level**: 使用 Tactile-Language Model (TLM) 将触觉信号翻译成语言，辅助 VLM 决策。
+        - **Low-level**: 通过 FiLM 将触觉特征注入 Diffusion Policy。
+        - **优势**: 无需重训整个 VLA，即插即用。
+    - **OmniVTLA**: 统一模型 (Unified Tokenization)。
+        - **架构**: 将视觉、触觉、语言全部 Token 化，输入同一个 Transformer。
+        - **语义对齐**: 使用 InfoNCE Loss 拉近触觉 Embedding 与材质描述文本的距离。
+        - **优势**: 能执行跨模态推理 (e.g., "Pick up the softest object")。
+
 ## 2. 场景题 (Scenario Questions)
 
 ### S1: 只有 100 条真机演示数据，如何训练一个鲁棒的抓取策略？
