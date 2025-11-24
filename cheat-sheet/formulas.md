@@ -14,6 +14,18 @@ $$
 - **V (Value)**: 实际提取的信息.
 - **$\sqrt{d_k}$**: 缩放因子，防止点积过大导致 Softmax 梯度消失。
 
+### Flash Attention 与在线 Softmax
+为了避免存储 $O(N^2)$ 的注意力矩阵，Flash Attention 使用在线 Softmax:
+$$
+m_{\text{new}} = \max(m_{\text{old}}, m_{\text{block}})
+$$
+$$
+l_{\text{new}} = e^{m_{\text{old}} - m_{\text{new}}} l_{\text{old}} + e^{m_{\text{block}} - m_{\text{new}}} l_{\text{block}}
+$$
+- **$m$**: 运行中的最大值。
+- **$l$**: 累积指数和。
+- **核心**: 逐块更新，内存占用 $O(N)$。
+
 ## 2. Diffusion Policy (扩散策略)
 Octo 等模型使用的动作生成方式。
 

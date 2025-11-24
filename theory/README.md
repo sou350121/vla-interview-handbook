@@ -14,6 +14,7 @@
     - **[动作生成范式对比 (Tokenization vs Diffusion vs Flow)](./action_representations.md)**
     - **[扩散策略详解 (Diffusion Policy)](./diffusion_policy.md)** (含 DDPM/DDIM, Noise Schedulers, EBM 视角, FiLM Conditioning)
     - **[触觉感知与 VLA (Tactile VLA)](./tactile_vla.md)** [New] (VLA-Touch, OmniVTLA)
+    - **[Flash Attention 优化原理](./flash_attention.md)** [New]
     - **[核心文献技术归纳 (Literature Review)](./literature_review.md)** [New]
 2. **[数据处理 (Data Processing)](./data.md)**
     - RLDS 格式详解
