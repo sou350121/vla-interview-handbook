@@ -42,3 +42,6 @@ venv.bak/
 # Project specific
 *.log
 tmp/
+
+# Configuration scripts (may contain sensitive info)
+configure_github_token.sh
