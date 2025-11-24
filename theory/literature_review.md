@@ -58,6 +58,14 @@
     - **ODE Solver**: 训练时学习向量场，推理时使用 **Euler** (极速) 或 **Heun** (高精) 求解。
 - **Key Contribution**: 结合了 VLM 的语义理解和 Flow Matching 的高频精细控制，实现了"大脑"与"小脑"的统一。
 
+### WALL-OSS (2024)
+- **核心创新**: 双动作分支架构 (Dual Action Branches)。
+    - **WALL-OSS-FLOW**: 基于 Flow Matching 的连续动作生成。
+    - **WALL-OSS-FAST**: 基于 FAST tokenizer 的离散动作生成。
+- **特色能力**: 具备 **Chain-of-Thought (COT) 推理** 能力，能够分步解释执行策略 (e.g., "First locate the red block, then grasp it...")。
+- **开放性**: 完全开源 (GitHub + HuggingFace)，支持 LeRobot 数据集微调。
+- **定位**: 强调 embodiment-aware 的视觉-语言理解和强语言-动作关联。
+
 ## 总结对比表 (Summary Table)
 
 | 特性 | Diffusion Policy | RT-2 | OpenVLA | Pi0 |

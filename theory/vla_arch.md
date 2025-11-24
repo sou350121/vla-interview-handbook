@@ -74,6 +74,7 @@
 | **RT-1** | EfficientNet + Transformer | Discrete Tokens | Robot Data Only | 推理快，稳定性高 | 泛化差，无语义推理 |
 | **RT-2** | PaLI-X / PaLM-E | Text Tokens | Web + Robot Data | 语义理解强，Zero-shot | 推理慢，闭源 |
 | **OpenVLA** | Llama 2 + SigLIP | Action Head | OXE Dataset | 开源，支持量化，易部署 | 性能略逊于闭源 SOTA |
+| **WALL-OSS** | Qwen2.5 VLMoE | **Dual Branches** (Flow + FAST) | Cross-Embodiment | **COT 推理**，双分支，**已开源** | 训练资源需求高 |
 | **π0.6** | Gemma 3 + Action Expert | Specialized | Cross-Embodiment + RL | 泛化强，精细操作好，**已开源** | 训练极其昂贵 |
 
 ## 面试高频考点
