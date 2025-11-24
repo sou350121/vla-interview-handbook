@@ -28,7 +28,28 @@ p_\theta(x_{t-1} | x_t) = \mathcal{N}(x_{t-1}; \mu_\theta(x_t, t), \Sigma_\theta
 $$
 - 机器人根据当前的观察 $O$，从高斯噪声 $x_T$ 中逐步去噪，生成动作序列 $x_0$。
 
-## 3. LoRA (Low-Rank Adaptation)
+## 3. Flow Matching (流匹配)
+Pi0 等模型使用的动作生成方式。
+
+### ODE 定义 (ODE Definition)
+$$
+\frac{dx}{dt} = v_t(x)
+$$
+- 学习一个向量场 $v_t$，将噪声 $x_1$ 确定性地推向数据 $x_0$。
+
+### 损失函数 (CFM Loss)
+$$
+\mathcal{L}_{CFM}(\theta) = \mathbb{E}_{t, x_0, x_1} \left[ \Vert v_\theta(x_t, t) - (x_1 - x_0) \Vert^2 \right]
+$$
+- 目标速度是恒定的直线方向 $x_1 - x_0$ (Optimal Transport)。
+
+### 欧拉步 (Euler Step)
+$$
+x_{t+dt} = x_t + v_\theta(x_t, t) \cdot dt
+$$
+- 推理时只需简单的数值积分。
+
+## 4. LoRA (Low-Rank Adaptation)
 OpenVLA 微调时的核心技术。
 
 $$
@@ -38,7 +59,7 @@ $$
 - $B \in \mathbb{R}^{d \times r}, A \in \mathbb{R}^{r \times k}$: 可训练的低秩矩阵 ($r \ll d, k$)。
 - **优势**: 显存占用极小，训练速度快。
 
-## 4. 机器人学基础 (Robotics Basics)
+## 5. 机器人学基础 (Robotics Basics)
 
 ### 坐标变换 (Coordinate Transformation)
 $$
@@ -55,7 +76,7 @@ $$
 - 单位四元数满足 $w^2 + x^2 + y^2 + z^2 = 1$。
 - **面试题**: 如何计算两个四元数的插值？(答: Slerp - 球面线性插值)
 
-## 5. 评价指标 (Metrics)
+## 6. 评价指标 (Metrics)
 
 ### Success Rate (成功率)
 $$
