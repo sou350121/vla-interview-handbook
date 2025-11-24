@@ -47,7 +47,46 @@ Transformer 抛弃了卷积，完全依赖 **Self-Attention (自注意力机制)
 2.  **语义理解**: 机器人不再只是"执行动作"，而是需要"理解环境"。Transformer 在语义提取上远强于 CNN。
 3.  **时序建模**: 动作序列 (Action Sequence) 本质上是时间序列。Transformer (GPT 风格) 天生适合处理序列预测问题。
 
-## 5. 面试常见问题
+## 5. 深度解析: ViT & SigLIP 技术细节
+在 OpenVLA 和 Pi0 等现代模型中，ViT (Vision Transformer) 通常搭配 **SigLIP** 预训练目标使用。
+
+### 5.1 Vision Transformer (ViT) 核心组件
+ViT 将图像视为一系列 Patch 的序列，完全摒弃了卷积。
+
+1.  **Patchify (切片)**:
+    - 输入图像 $x \in \mathbb{R}^{H \times W \times C}$ 被切分为 $N$ 个 $P \times P$ 的 Patch。
+    - $N = (H \times W) / P^2$。例如 $224 \times 224$ 图像，Patch 大小 16，则 $N = 196$。
+    - 每个 Patch 被展平并通过线性映射 (Linear Projection) 转换为 $D$ 维向量。
+
+2.  **Positional Embedding (位置编码)**:
+    - 由于 Transformer 是置换不变的 (Permutation Invariant)，必须手动注入位置信息。
+    - ViT 使用可学习的 1D 位置编码，直接加到 Patch Embedding 上。
+
+3.  **CLS Token vs Average Pooling**:
+    - **CLS Token**: 原始 ViT 在序列开头加一个特殊的 `[CLS]` Token，其输出作为整张图的特征 (BERT 风格)。
+    - **Average Pooling**: 现代 ViT (如 SigLIP) 往往去掉 CLS Token，直接对所有 Patch 的输出取平均 (Global Average Pooling)，效果更稳健。
+
+### 5.2 SigLIP (Sigmoid Loss for Language Image Pre-training)
+OpenVLA 的视觉编码器使用的是 **SigLIP** (来自 Google DeepMind)，而非传统的 CLIP。
+
+#### 为什么不用 CLIP (Softmax Loss)?
+传统的 CLIP 使用 **InfoNCE Loss** (基于 Softmax)，需要维护巨大的负样本对 (Negative Pairs)。
+$$
+L_{CLIP} = -\log \frac{e^{sim(I, T)}}{\sum_{j} e^{sim(I, T_j)}}
+$$
+- **缺点**: 必须进行全局归一化 (Softmax)，导致必须在所有 GPU 之间同步巨大的 Batch，通信开销极大。
+
+#### SigLIP 的创新 (Sigmoid Loss)
+SigLIP 将多分类问题转化为 **二分类问题 (Binary Classification)**。对每一对 (Image, Text)，独立判断它们是否匹配。
+$$
+L_{SigLIP} = - \log \sigma(sim(I, T)) - \sum_{j \neq i} \log (1 - \sigma(sim(I, T_j)))
+$$
+- **优势**:
+    1.  **无需全局同步**: 每个 GPU 可以只处理自己的负样本，无需跨卡通信 Softmax 分母。
+    2.  **Batch Size 独立**: 性能不再强依赖于超大 Batch Size。
+    3.  **更高效**: 在相同计算资源下，SigLIP 的 Zero-shot 准确率显著高于 CLIP。
+
+## 6. 面试常见问题
 
 **Q: 为什么 ViT 需要比 ResNet 更多的数据?**
 A: 因为 ViT 缺乏 **归纳偏置 (Inductive Bias)**。CNN 天生知道"相邻像素相关"和"平移不变"，而 ViT 必须从数据中自己学习这些规律。
