@@ -53,38 +53,49 @@ Transformer 抛弃了卷积，完全依赖 **Self-Attention (自注意力机制)
 ### 5.1 Vision Transformer (ViT) 核心组件
 ViT 将图像视为一系列 Patch 的序列，完全摒弃了卷积。
 
-1.  **Patchify (切片)**:
-    - 输入图像 $x \in \mathbb{R}^{H \times W \times C}$ 被切分为 $N$ 个 $P \times P$ 的 Patch。
-    - $N = (H \times W) / P^2$。例如 $224 \times 224$ 图像，Patch 大小 16，则 $N = 196$。
-    - 每个 Patch 被展平并通过线性映射 (Linear Projection) 转换为 $D$ 维向量。
+1.  **Patchify & Linear Projection (切片与线性映射)**:
+    - 输入图像 $x \in \mathbb{R}^{H \times W \times C}$ 被切分为 $N$ 个 $P \times P$ 的 Patch $x_p \in \mathbb{R}^{N \times (P^2 \cdot C)}$。
+    - **公式**:
+      $$
+      z_0 = [x_p^1 E; x_p^2 E; \cdots; x_p^N E] + E_{pos}
+      $$
+      其中 $E \in \mathbb{R}^{(P^2 \cdot C) \times D}$ 是可学习的线性投影矩阵，$E_{pos} \in \mathbb{R}^{(N+1) \times D}$ 是位置编码。
+    - **关键细节**: 这一步等价于一个 `Conv2d(in_channels=3, out_channels=D, kernel_size=P, stride=P)` 操作。
 
-2.  **Positional Embedding (位置编码)**:
-    - 由于 Transformer 是置换不变的 (Permutation Invariant)，必须手动注入位置信息。
-    - ViT 使用可学习的 1D 位置编码，直接加到 Patch Embedding 上。
+2.  **Positional Embedding Interpolation (位置编码插值)**:
+    - **问题**: VLA 任务中，输入图像分辨率可能变化 (e.g., 224x224 -> 384x384)，导致 Patch 数量 $N$ 变化。
+    - **解决方案**: 预训练的 1D 位置编码不能直接用。需要将其 reshape 成 2D 网格，进行 **双线性插值 (Bicubic/Bilinear Interpolation)** 到新的尺寸，再展平回 1D。这是 ViT 能处理不同分辨率的关键。
 
 3.  **CLS Token vs Average Pooling**:
     - **CLS Token**: 原始 ViT 在序列开头加一个特殊的 `[CLS]` Token，其输出作为整张图的特征 (BERT 风格)。
-    - **Average Pooling**: 现代 ViT (如 SigLIP) 往往去掉 CLS Token，直接对所有 Patch 的输出取平均 (Global Average Pooling)，效果更稳健。
+    - **Average Pooling (GAP)**: 现代 ViT (如 SigLIP) 往往去掉 CLS Token，直接对所有 Patch 的输出取平均 (Global Average Pooling)。
+      - **优势**: 能够利用全图信息，且对 Learning Rate 更鲁棒 (MAP 论文指出 GAP 优于 CLS)。
 
 ### 5.2 SigLIP (Sigmoid Loss for Language Image Pre-training)
 OpenVLA 的视觉编码器使用的是 **SigLIP** (来自 Google DeepMind)，而非传统的 CLIP。
 
-#### 为什么不用 CLIP (Softmax Loss)?
+#### 1. 为什么不用 CLIP (Softmax Loss)?
 传统的 CLIP 使用 **InfoNCE Loss** (基于 Softmax)，需要维护巨大的负样本对 (Negative Pairs)。
 $$
-L_{CLIP} = -\log \frac{e^{sim(I, T)}}{\sum_{j} e^{sim(I, T_j)}}
+L_{CLIP} = -\frac{1}{N} \sum_{i=1}^N \log \frac{e^{x_i \cdot y_i / \tau}}{\sum_{j=1}^N e^{x_i \cdot y_j / \tau}}
 $$
-- **缺点**: 必须进行全局归一化 (Softmax)，导致必须在所有 GPU 之间同步巨大的 Batch，通信开销极大。
+- **通信瓶颈**: 分母 $\sum e^{...}$ 需要聚合所有 GPU 上的所有样本 (Global Reduction)。在分布式训练中，这会导致巨大的通信开销。
 
-#### SigLIP 的创新 (Sigmoid Loss)
-SigLIP 将多分类问题转化为 **二分类问题 (Binary Classification)**。对每一对 (Image, Text)，独立判断它们是否匹配。
+#### 2. SigLIP 的创新 (Sigmoid Loss)
+SigLIP 将 $N \times N$ 的匹配问题转化为 **$N^2$ 个独立的二分类问题**。
 $$
-L_{SigLIP} = - \log \sigma(sim(I, T)) - \sum_{j \neq i} \log (1 - \sigma(sim(I, T_j)))
+L_{SigLIP} = - \frac{1}{N} \sum_{i=1}^N \sum_{j=1}^N \left[ \mathbb{I}_{i=j} \log \sigma(x_i \cdot y_j / \tau + b) + \mathbb{I}_{i \neq j} \log (1 - \sigma(x_i \cdot y_j / \tau + b)) \right]
 $$
+- **$\mathbb{I}_{i=j}$**: 正样本对 (对角线)，标签为 1。
+- **$\mathbb{I}_{i \neq j}$**: 负样本对 (非对角线)，标签为 0。
 - **优势**:
-    1.  **无需全局同步**: 每个 GPU 可以只处理自己的负样本，无需跨卡通信 Softmax 分母。
-    2.  **Batch Size 独立**: 性能不再强依赖于超大 Batch Size。
-    3.  **更高效**: 在相同计算资源下，SigLIP 的 Zero-shot 准确率显著高于 CLIP。
+    1.  **无需全局同步**: 每个 GPU 只需处理自己手头的负样本，梯度计算是局部的。
+    2.  **Batch Size 独立**: 性能不再强依赖于超大 Batch Size (CLIP 需要大 Batch 提供足够负样本，SigLIP 对 Batch 大小不敏感)。
+
+#### 3. 关键实现细节: Bias Initialization
+SigLIP 引入了一个可学习的 Bias $b$ (通常初始化为 $- \log N$)。
+- **原因**: 在训练初期，正样本极少 (1个)，负样本极多 ($N-1$个)。如果 Bias 为 0，Sigmoid 输出 0.5，会导致巨大的初始 Loss (因为大部分应该是 0)。
+- **Trick**: 初始化 $b = -10$ 或 $- \log N$，强制初始概率接近 0，匹配负样本占主导的先验分布，极大地稳定了训练。
 
 ## 6. 面试常见问题
 
