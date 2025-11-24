@@ -21,9 +21,9 @@
 本项目包含以下核心模块：
 
 ### 1. [理论基础 (Theory)](./theory/)
-- **VLA 核心架构**: RT-1, RT-2, OpenVLA, Octo, π0 (Pi-Zero).
-- **Pi 系列解剖**: [Pi0.5 (Unified Model)](./theory/pi0_5_dissection.md), [Pi0.6 (Recap RL)](./theory/pi0_6_dissection.md).
-- **动作生成范式**: [离散化 vs 扩散 vs 流匹配](./theory/action_representations.md).
+    - **VLA 核心架构**: RT-1, RT-2, OpenVLA, Octo, π0 (Pi-Zero).
+    - **Pi 系列解剖**: [Pi0 代码解构 (Flow Matching)](./theory/pi0_flow_matching.md), [Pi0.5 (Unified Model)](./theory/pi0_5_dissection.md), [Pi0.6 (Recap RL)](./theory/pi0_6_dissection.md).
+    - **动作生成范式**: [离散化 vs 扩散 (Diffusion Policy) vs 流匹配 (Flow Matching)](./theory/action_representations.md).
 - **多模态大模型**: CLIP, LLaVA, Flamingo 原理回顾.
 - **数据处理**: RLDS 格式, 异构数据 Co-training.
 
