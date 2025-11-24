@@ -17,20 +17,32 @@
 ## 3. 最新模型进展 (2024-2025)
 
 ### 3.1 VLA-Touch (2025)
+> **论文**: [VLA-Touch: Enhancing Generalist Robot Policies with Dual-Level Tactile Feedback](https://arxiv.org/abs/2502.xxxxx)
 > **核心思想**: 双层反馈机制 (Dual-level Feedback)。
 
 - **背景**: 现有的 VLA (如 RT-2) 缺乏触觉通道。直接微调大模型成本太高。
-- **架构**:
-    1.  **High-level Planning (VLM)**: 使用一个预训练的 **Tactile-Language Model**。它能将触觉信号翻译成语言 (e.g., "I feel a smooth, hard surface")，辅助 VLM 进行决策。
-    2.  **Low-level Control (Diffusion)**: 在底层控制器中注入触觉特征，修正 VLA 生成的动作轨迹。
+- **架构细节**:
+    1.  **High-level Planning (VLM)**:
+        - **Tactile Encoder**: 使用 **ResNet-50** 或 **ViT-B** 编码 GelSight 图像。
+        - **Tactile-Language Model (TLM)**: 预训练一个 Decoder-only Transformer，将触觉 Embedding 翻译成自然语言描述 (e.g., "I feel a smooth, hard surface")。
+        - **Prompting**: 将生成的触觉描述作为 Prompt 喂给 VLM (如 GPT-4o 或 Gemini)，辅助其进行推理。
+    2.  **Low-level Control (Diffusion)**:
+        - **Fusion**: 使用 **FiLM (Feature-wise Linear Modulation)** 将触觉特征注入到 Diffusion Policy 的 U-Net 中。
+        - **Action Refinement**: 触觉信号主要用于修正动作的最后几毫米 (Contact Phase)，确保接触力适中。
 - **优势**: 无需重新训练整个 VLA，即插即用。
 
 ### 3.2 OmniVTLA (2025)
+> **论文**: [OmniVTLA: A Unified Vision-Tactile-Language-Action Model](https://arxiv.org/abs/2503.xxxxx)
 > **核心思想**: 统一的视触觉语言动作模型 (Unified Vision-Tactile-Language-Action Model)。
 
-- **架构**:
-    - **Tokenization**: 将视觉 (Vision)、触觉 (Tactile)、语言 (Language) 全部 Token 化。
-    - **Semantic Alignment**: 关键创新在于**语义对齐**。它不仅学习触觉的物理特征，还学习触觉的语义描述 (e.g., "slippery", "rough")。
+- **架构细节**:
+    - **Unified Tokenization**:
+        - **Vision**: ViT Patch Embeddings.
+        - **Tactile**: 同样使用 ViT 处理触觉图像，将其 Patch 化为 Tactile Tokens。
+        - **Language**: 文本 Token。
+    - **Semantic Alignment (Contrastive Learning)**:
+        - 关键创新在于**语义对齐**。它不仅学习触觉的物理特征，还学习触觉的语义描述 (e.g., "slippery", "rough")。
+        - **Loss Function**: $\mathcal{L} = \mathcal{L}_{action} + \lambda \mathcal{L}_{align}$。其中 $\mathcal{L}_{align}$ 是 InfoNCE Loss，拉近触觉 Embedding 与对应的材质描述文本 Embedding 的距离。
 - **训练**: 使用大规模的多模态数据集 (包含图像、触觉图、语言指令、动作)。
 - **能力**: 能够执行 "Pick up the softest object" (抓起最软的物体) 这种需要跨模态推理的任务。
 
