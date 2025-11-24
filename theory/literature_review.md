@@ -1,0 +1,64 @@
+# VLA 文献核心技术归纳 (Literature Technical Review)
+
+本章节对 VLA 领域的核心文献进行**深度技术归纳**，适合面试前快速复习模型细节。
+
+## 1. Diffusion Policy (Chi et al., RSS 2023)
+> **论文**: [Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](https://arxiv.org/abs/2303.04137)
+
+- **核心问题**: 解决传统 MSE 回归在多模态分布 (Multimodal Distribution) 下的平均值问题 (即"撞墙"问题)。
+- **核心技术**: **DDPM (Denoising Diffusion Probabilistic Models)**。将动作生成建模为从高斯噪声中逐步去噪的过程。
+- **Backbone**:
+    - **CNN-based**: 1D Temporal CNN (类似 U-Net)，适合短时序。
+    - **Transformer-based**: DiT (Diffusion Transformer)，适合长时序。
+- **Action Space**: **连续空间 (Continuous)**。无离散化误差，精度极高。
+- **Inference**: 迭代去噪。原始 DDPM 需 100 步，使用 **DDIM** 可加速至 10-15 步。
+- **Key Contribution**: 首次将生成式 AI (Generative AI) 引入机器人控制，完美解决了多解问题，并在高精度任务 (如穿针) 上表现卓越。
+
+## 2. RT-2 (Google DeepMind, 2023)
+> **论文**: [RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control](https://arxiv.org/abs/2307.15818)
+
+- **核心问题**: 如何让机器人拥有互联网级别的语义理解能力 (泛化到未见过的物体/指令)。
+- **核心技术**: **VLA (Vision-Language-Action)** = VLM + Action Tokens。
+- **Backbone**: **PaLI-X (55B)** 或 **PaLM-E (12B)**。
+- **Action Tokenization**:
+    - **Uniform Discretization**: 将动作维度归一化并切分为 **256 个 Bins**。
+    - **Text Mapping**: 将这些 Bins 映射为特殊的文本 Token (如 "1", "128")，与自然语言共享词表。
+- **Training**: **Co-fine-tuning** (混合微调)。同时训练互联网 VQA 数据 (保持语义) 和机器人操作数据 (学习控制)。
+- **Key Contribution**: 涌现出 **Semantic Reasoning** (语义推理) 能力。例如听到 "pick up the extinct animal" 能抓起恐龙玩具，尽管训练数据里只有 "pick up dinosaur"。
+
+## 3. OpenVLA (Stanford, 2024)
+> **论文**: [OpenVLA: An Open-Source Vision-Language-Action Model](https://arxiv.org/abs/2406.09246)
+
+- **核心问题**: 复现 RT-2 的能力，但完全开源且高效。
+- **核心技术**: **Parameter-Efficient Fine-Tuning (LoRA)**。
+- **Backbone**:
+    - **Language**: **Llama 2 7B**。
+    - **Vision**: **SigLIP** (比 CLIP 更强的视觉编码器)。
+    - **Projector**: 2-layer MLP (将视觉 Embedding 映射到语言空间)。
+- **Action Output**:
+    - 不同于 RT-2 直接输出文本，OpenVLA 使用专门的 **Action Head** (Linear Layer) 预测去离散化的动作 Token。
+    - 依然是 **256-bin Discretization**。
+- **Optimization**: 支持 **4-bit Quantization (QLoRA)**，使得 7B 模型可以在消费级显卡 (如 RTX 3090/4090) 上运行。
+- **Key Contribution**: 提供了第一个性能接近闭源 SOTA 的开源 VLA 模型，并构建了完整的开源训练/部署生态。
+
+## 4. Pi0 (Physical Intelligence, 2024)
+> **论文**: [π0: A Generalist Robot Foundation Model](https://www.physicalintelligence.company/blog/pi0)
+
+- **核心问题**: 解决 VLM 推理速度慢、难以进行高频 (50Hz) 连续控制的问题。
+- **核心技术**: **Flow Matching (流匹配)**。
+- **Backbone**: **PaliGemma 3B** (Google 的轻量级 VLM)。
+- **Action Space**: **连续空间 (Continuous)**。
+    - 不同于 RT-2/OpenVLA 的离散 Token，Pi0 输出连续动作，避免了量化误差。
+- **Inference**: 使用 ODE Solver (常微分方程求解器)。相比 Diffusion 的随机游走，Flow Matching 走直线，**1-10 步**即可生成高质量动作。
+- **Key Contribution**: 结合了 VLM 的语义理解和 Flow Matching 的高频精细控制，实现了"大脑"与"小脑"的统一。
+
+## 总结对比表 (Summary Table)
+
+| 特性 | Diffusion Policy | RT-2 | OpenVLA | Pi0 |
+| :--- | :--- | :--- | :--- | :--- |
+| **核心机制** | Denoising (去噪) | Token Prediction (分类) | Token Prediction (分类) | Flow Matching (ODE) |
+| **动作空间** | 连续 (Continuous) | 离散 (Discrete 256) | 离散 (Discrete 256) | 连续 (Continuous) |
+| **Backbone** | CNN / Transformer | PaLI-X / PaLM-E | Llama 2 + SigLIP | PaliGemma 3B |
+| **推理速度** | 慢 (需加速) | 极慢 (大模型) | 中等 (7B) | 快 (Flow) |
+| **语义能力** | 弱 (需外挂 VLM) | 极强 | 强 | 强 |
+| **适用场景** | 精细操作 (穿针) | 高层语义规划 | 通用操作 | 通用 + 高频控制 |

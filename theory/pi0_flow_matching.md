@@ -21,6 +21,7 @@ $$
 - **Diffusion**: 轨迹是随机的 (Stochastic)，像布朗运动一样跌跌撞撞地去噪。推理步数多 (50-100步)。
 - **Flow Matching**: 我们可以强制模型学习一条 **"直的" (Straight)** 轨迹。
     - **Optimal Transport (最优传输)**: 点对点之间直线最短。Flow Matching 可以学习这种直线路径，使得推理极其高效 (10步以内)。
+    - **确定性与稳定性**: 相比于随机采样，ODE 的确定性使得动作生成更加平滑，减少了高频抖动 (Jitter)，这对机械臂控制至关重要。
 
 ## 2. 核心公式详解 (Key Formulas)
 
@@ -35,14 +36,14 @@ $$
 ### 2.2 目标速度 (Target Velocity)
 对上面的路径 $x_t$ 对时间 $t$ 求导，得到该路径上的理想速度 $u_t(x|x_1)$：
 $$
-\frac{d}{dt} x_t = \frac{d}{dt} ((1 - t)x_0 + t x_1) = x_1 - x_0
+\frac{d}{dt} x_t = \frac{d}{dt} \left( (1 - t)x_0 + t x_1 \right) = x_1 - x_0
 $$
 - **物理含义**: 目标速度是一个恒定向量，方向从 $x_0$ 指向 $x_1$。这非常直观：要从数据变到噪声，就一直往噪声方向走；反之亦然。
 
 ### 2.3 损失函数 (Loss Function)
 我们训练一个神经网络 $v_\theta(x_t, t, \text{cond})$ 来拟合这个目标速度。这就是 **Conditional Flow Matching (CFM)** loss：
 $$
-\mathcal{L}(\theta) = \mathbb{E}_{t, x_0, x_1} \left[ || v_\theta(x_t, t, \text{cond}) - (x_1 - x_0) ||^2 \right]
+\mathcal{L}(\theta) = \mathbb{E}_{t, x_0, x_1} \left[ \| v_\theta(x_t, t, \text{cond}) - (x_1 - x_0) \|^2 \right]
 $$
 - **输入**:
     - $x_t$: 当前时刻的插值状态 (混合了数据和噪声)。
@@ -80,23 +81,34 @@ class Pi0VLMBackbone(nn.Module):
 class FlowMatchingPolicy(nn.Module):
     def __init__(self, action_dim, cond_dim, hidden_dim=1024):
         super().__init__()
-        # 输入: 噪声动作(action_dim) + 时间t(1) + 条件(cond_dim)
+        # Time Embedding: 将标量 t 映射为高维向量，捕捉细粒度的时间信息
+        self.time_mlp = nn.Sequential(
+            SinusoidalPositionEmbeddings(dim=256),
+            nn.Linear(256, 256),
+            nn.SiLU()
+        )
+        
+        # 输入: 噪声动作(action_dim) + 时间embedding(256) + 条件(cond_dim)
         self.net = nn.Sequential(
-            nn.Linear(action_dim + 1 + cond_dim, hidden_dim),
-            nn.ReLU(),
+            nn.Linear(action_dim + 256 + cond_dim, hidden_dim),
+            nn.SiLU(), # Swish/SiLU 通常比 ReLU 效果更好
             nn.Linear(hidden_dim, hidden_dim),
-            nn.ReLU(),
+            nn.SiLU(),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.SiLU(),
             nn.Linear(hidden_dim, action_dim) # 输出 dx/dt
         )
 
     def forward(self, x_t, t, condition):
-        # t 需要广播到 batch 维度
-        t_embed = t.view(-1, 1).expand(x_t.shape[0], 1)
+        # 1. 处理时间 t
+        # t: [batch_size, 1] -> t_emb: [batch_size, 256]
+        t_emb = self.time_mlp(t)
         
-        # 拼接输入
-        input_feat = torch.cat([x_t, t_embed, condition], dim=-1)
+        # 2. 拼接输入
+        # 简单的 Concat 策略，更高级的可以用 AdaLN (Adaptive Layer Norm) 注入条件
+        input_feat = torch.cat([x_t, t_emb, condition], dim=-1)
         
-        # 预测向量场 (Velocity)
+        # 3. 预测向量场 (Velocity)
         velocity = self.net(input_feat)
         return velocity
 ```
@@ -106,9 +118,9 @@ class FlowMatchingPolicy(nn.Module):
 
 ```python
 @torch.no_grad()
-def generate_action(policy, vlm_cond, action_dim, steps=10):
+def generate_action(policy, vlm_cond, action_dim, steps=10, cfg_scale=1.0):
     """
-    从高斯噪声生成动作
+    从高斯噪声生成动作，支持 Classifier-Free Guidance (CFG)
     """
     batch_size = vlm_cond.shape[0]
     
@@ -116,7 +128,6 @@ def generate_action(policy, vlm_cond, action_dim, steps=10):
     x_t = torch.randn(batch_size, action_dim, device=device)
     
     # 2. 定义时间步 (从 1 到 0)
-    # Flow Matching 通常定义 t=1 为噪声，t=0 为数据
     dt = -1.0 / steps 
     times = torch.linspace(1.0, 0.0, steps + 1, device=device)
     
@@ -125,12 +136,25 @@ def generate_action(policy, vlm_cond, action_dim, steps=10):
         t_curr = times[i]
         
         # 预测当前位置的速度向量 v_t
-        velocity = policy(x_t, t_curr, vlm_cond)
+        # CFG: 同时计算有条件和无条件的速度
+        if cfg_scale > 1.0:
+            # 构造无条件输入 (空指令/空图像)
+            null_cond = torch.zeros_like(vlm_cond) 
+            # 批量预测
+            input_cond = torch.cat([vlm_cond, null_cond])
+            input_x = torch.cat([x_t, x_t])
+            input_t = torch.cat([t_curr, t_curr])
+            
+            v_cond, v_uncond = policy(input_x, input_t, input_cond).chunk(2)
+            
+            # 组合速度向量
+            velocity = v_uncond + cfg_scale * (v_cond - v_uncond)
+        else:
+            velocity = policy(x_t, t_curr, vlm_cond)
         
         # 更新位置: x_{t+dt} = x_t + v_t * dt
         x_t = x_t + velocity * dt
         
-    # 最终 x_t 即为生成的动作 x_0
     return x_t
 ```
 
