@@ -52,23 +52,33 @@
 3.  **硬件成本**: 高分辨率触觉传感器 (如 GelSight) 依然昂贵且易损耗。
 
 ## 5. 深度解析: ResNet vs ViT for Tactile
-在触觉 VLA 中，选择 ResNet 还是 ViT 作为触觉编码器 (Tactile Encoder) 是一个关键的设计决策。
+在触觉 VLA 中，选择 ResNet 还是 ViT 作为触觉编码器 (Tactile Encoder) 是一个关键的设计决策。这不仅仅是"CNN vs Transformer"的问题，而是关乎**触觉信号的物理特性**如何被编码。
 
-### 5.1 ResNet (CNN)
-- **适用场景**: **VLA-Touch** 等需要提取局部纹理特征的模型。
-- **优势**:
-    - **局部敏感性 (Locality)**: 触觉感知高度依赖于接触面的微小纹理 (Texture) 和边缘 (Edge)。CNN 的滑动窗口机制天生适合提取这些局部特征。
-    - **平移不变性**: 无论物体接触在传感器的哪个位置，CNN 都能提取出相同的特征。
-    - **数据效率**: 在触觉数据稀缺的情况下，CNN 通常比 ViT 更容易训练收敛。
-- **劣势**: 难以捕捉长距离的接触模式 (例如：手指指尖和指根同时接触物体时的关联)。
+### 5.1 ResNet (CNN): 纹理与几何的专家
+ResNet 在处理 GelSight 这类**基于光学 (Optical-based)** 的触觉传感器时表现出色，原因在于其**归纳偏置 (Inductive Bias)** 与触觉图像的特性高度契合。
 
-### 5.2 ViT (Transformer)
-- **适用场景**: **OmniVTLA** 等追求多模态统一 (Unified Tokenization) 的模型。
-- **优势**:
-    - **统一接口 (Patchify)**: 将触觉图像切成 Patch (如 16x16)，直接变成 Token 序列。这使得触觉 Token 可以和视觉 Token、语言 Token 无缝拼接，输入同一个 Transformer。
-    - **全局感受野**: 能够捕捉整个接触面的受力分布模式。
-    - **Masked Autoencoders (MAE)**: 可以利用 MAE 进行自监督预训练 (Mask 掉 75% 的触觉 Patch 让模型重建)，从而利用大量无标签的触觉数据。
-- **劣势**: 需要更多的数据预训练，否则容易过拟合。
+*   **技术细节**:
+    *   **平移不变性 (Translation Invariance)**: 触觉特征（如物体表面的凸起）可能出现在传感器的任何位置。ResNet 的**权重共享 (Weight Sharing)** 卷积核保证了无论凸起在哪里，提取的特征都是一致的。
+    *   **局部性 (Locality)**: 触觉感知的核心是**接触 (Contact)**。接触通常发生在局部区域。ResNet 的卷积核 (e.g., 3x3) 强制模型关注局部像素的梯度变化，这对于检测**边缘 (Edges)**、**纹理 (Textures)** 和 **滑移 (Slip)** 至关重要。
+    *   **层级特征 (Hierarchical Features)**: ResNet 通过 Pooling 不断下采样，自然地形成了从"微观纹理"到"宏观形状"的特征金字塔。这对于判断物体材质（微观）和抓取稳定性（宏观）都很有用。
+
+### 5.2 ViT (Transformer): 全局接触与多模态统一
+ViT 在 OmniVTLA 等最新模型中更受欢迎，主要是为了**多模态对齐**和**全局上下文**。
+
+*   **技术细节**:
+    *   **Patchify & Linear Projection**: ViT 将 $224 \times 224$ 的触觉图像切分为 $16 \times 16$ 的 Patches，展平后通过线性层映射为 Embedding。这一步彻底打破了像素的网格结构，使其能与文本 Token 在同一向量空间中交互。
+    *   **全局感受野 (Global Receptive Field)**: Self-Attention 允许每一个 Tactile Patch 在第一层就与其他所有 Patch 交互。这对于理解**多点接触 (Multi-point Contact)** 非常关键。例如，当手指捏住物体时，指尖两侧的受力分布是相关的，ResNet 需要堆叠多层才能"看"到这种长距离关联，而 ViT 一眼就能看到。
+    *   **位置编码 (Positional Encoding)**: 由于 ViT 没有卷积的归纳偏置，它必须依赖可学习的位置编码来理解"哪里是上，哪里是下"。在触觉中，绝对位置往往对应着机械手的具体部位 (e.g., 指尖 vs 指腹)，这对控制很重要。
+
+### 5.3 核心差异对比表
+
+| 特性 | ResNet (Tactile) | ViT (Tactile) |
+| :--- | :--- | :--- |
+| **归纳偏置** | 强 (平移不变, 局部性) | 弱 (需数据学习) |
+| **擅长特征** | **高频纹理** (Texture), 边缘, 局部形变 | **低频分布** (Force Distribution), 全局接触模式 |
+| **数据需求** | 低 (几千张图即可收敛) | 高 (需 MAE 预训练或 ImageNet 迁移) |
+| **多模态融合** | 需通过 Pooling 压缩成向量后融合 | **Token 级融合** (可与 Text Token 拼接) |
+| **典型应用** | 材质识别, 滑移检测 (Slip Detection) | 复杂操作策略 (Manipulation Policy), 跨模态推理 |
 
 ## 6. 面试常见问题
 **Q: 触觉图像 (Tactile Image) 和普通 RGB 图像有什么区别?**
