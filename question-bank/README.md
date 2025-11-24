@@ -4,7 +4,7 @@
 
 ## 目录
 1. **[面试真题 (Questions)](./questions.md)**
-    - 概念题: RT-2, Tokenization, Sim-to-Real, **Transformer vs CNN**, **Tactile VLA**
+    - 概念题: RT-2, Tokenization, Sim-to-Real, **Transformer vs CNN**, **Tactile VLA**, **Flash Attention**
     - 场景题: 小样本训练, 透明物体抓取
     - 代码题: PID, 几何计算
     - **[OpenVLA 微调实战 (Fine-tuning)](./openvla_finetuning.md)** [New]

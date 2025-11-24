@@ -21,11 +21,14 @@
 本项目包含以下核心模块：
 
 ### 1. [理论基础 (Theory)](./theory/)
-    - **VLA 核心架构**: RT-1, RT-2, OpenVLA, Octo, π0 (Pi-Zero).
+    - **VLA 核心架构**: RT-1, RT-2, OpenVLA, Octo, Pi0 (Pi-Zero), Wall-X.
+    - **Backbone 对比**: [Transformer (ViT) vs CNN (ResNet)](./theory/transformer_vs_cnn.md) (含 SigLIP, Patchify).
     - **Pi 系列解剖**: [Pi0 代码解构 (Flow Matching)](./theory/pi0_flow_matching.md) (含 OT-CFM, ODE Solvers), [Pi0.5 (Unified Model)](./theory/pi0_5_dissection.md), [Pi0.6 (Recap RL)](./theory/pi0_6_dissection.md).
     - **动作生成范式**: [离散化 vs 扩散 (Diffusion Policy) vs 流匹配 (Flow Matching)](./theory/action_representations.md).
     - **触觉感知**: [Tactile VLA](./theory/tactile_vla.md) (GelSight, VLA-Touch).
     - **扩散策略深度**: [Diffusion Policy 详解](./theory/diffusion_policy.md) (含 EBM 视角, FiLM, Noise Schedulers).
+    - **性能优化**: [Flash Attention 原理](./theory/flash_attention.md) (Kernel Fusion, Recomputation).
+    - **文献综述**: [核心文献技术归纳](./theory/literature_review.md).
 - **多模态大模型**: CLIP, LLaVA, Flamingo 原理回顾.
 - **数据处理**: RLDS 格式, 异构数据 Co-training.
 
