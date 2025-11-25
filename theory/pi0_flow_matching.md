@@ -25,6 +25,9 @@ $$
     - **Optimal Transport (最优传输)**: 点对点之间直线最短。Flow Matching 可以学习这种直线路径，使得推理极其高效 (10步以内)。
     - **确定性与稳定性**: 相比于随机采样，ODE 的确定性使得动作生成更加平滑，减少了高频抖动 (Jitter)，这对机械臂控制至关重要。
 
+![Flow Matching vs Diffusion](../assets/flow_matching_vs_diffusion.png)
+*图示: Diffusion 的随机轨迹 (左) vs Flow Matching 的直线轨迹 (右)*
+
 ## 2. 核心公式详解 (Key Formulas)
 
 ### 2.1 线性插值路径 (Conditional Flow)
