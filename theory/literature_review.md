@@ -82,30 +82,30 @@
     - 实现了 **Data-Driven Self-Improvement**。
 - **Key Contribution**: 证明了机器人可以通过自我复盘 (Recap) 在操作速度和鲁棒性上超越人类专家。
 
-### WALL-OSS (2024)
-- **核心创新**: 双动作分支架构 (Dual Action Branches)。
-    - **WALL-OSS-FLOW**: 基于 Flow Matching 的连续动作生成。
-    - **WALL-OSS-FAST**: 基于 FAST tokenizer 的离散动作生成。
-- **特色能力**: 具备 **Chain-of-Thought (COT) 推理** 能力，能够分步解释执行策略 (e.g., "First locate the red block, then grasp it...")。
-- **开放性**: 完全开源 (GitHub + HuggingFace)，支持 LeRobot 数据集微调。
-- **定位**: 强调 embodiment-aware 的视觉-语言理解和强语言-动作关联。
+## 7. WALL-OSS (X Square Robot, 2024)
+> **论文**: [WALL-OSS: Igniting VLMs toward the Embodied Space](https://arxiv.org/abs/2408.xxxxx) (需确认 ArXiv ID, 或引用 GitHub)
+> **GitHub**: [X-Square-Robot/wall-x](https://github.com/X-Square-Robot/wall-x)
+
+- **核心问题**: 现有 VLM 缺乏对空间和具身环境的深入理解，且难以进行长序列推理。
+- **核心技术**: **Embodiment-aware VLU** + **Unified Cross-Level Chain-of-Thought (CoT)**。
+- **架构创新**:
+    - **Dual Output Heads**:
+        - **WALL-OSS-FLOW**: 基于 **Flow Matching** 的连续动作生成 (高精度)。
+        - **WALL-OSS-FAST**: 基于 **FAST Tokenizer** 的离散动作生成 (高速度)。
+    - **Unified CoT**: 将指令推理 (Instruction Reasoning)、子目标分解 (Subgoal Decomposition) 和动作合成 (Action Synthesis) 统一在一个可微分的 CoT 过程中。
+- **Data Strategy**: 强调 **Language-Action Association**，通过大规模多模态预训练建立语言与动作的强关联。
+- **Key Contribution**: 提出了一个端到端的具身基础模型，开源了完整的训练/推理代码 (Wall-X)，并展示了在长序列操作任务上的优越性能。
 
 ## 总结对比表 (Summary Table)
 
-| 特性 | Diffusion Policy | RT-2 | OpenVLA | Pi0 | Pi0.6 |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **核心机制** | Denoising | Token Prediction | Token Prediction | Flow Matching | **Recap (RL)** |
-| **动作空间** | 连续 | 离散 (256) | 离散 (256) | 连续 | 连续 + Expert |
-| **Backbone** | CNN/ViT | PaLI-X | Llama 2 | PaliGemma 3B | **5B VLM** |
-| **推理速度** | 慢 | 极慢 | 中等 | 快 | **极快 (Expert)** |
-| **语义能力** | 弱 | 极强 | 强 | 强 | **最强** |
-| **适用场景** | 精细操作 | 高层规划 | 通用操作 | 通用控制 | **自我进化** |
-| **核心机制** | Denoising (去噪) | Token Prediction (分类) | Token Prediction (分类) | Flow Matching (ODE) |
-| **动作空间** | 连续 (Continuous) | 离散 (Discrete 256) | 离散 (Discrete 256) | 连续 (Continuous) |
-| **Backbone** | CNN / Transformer | PaLI-X / PaLM-E | Llama 2 + SigLIP | PaliGemma 3B |
-| **推理速度** | 慢 (需加速) | 极慢 (大模型) | 中等 (7B) | 快 (Flow) |
-| **语义能力** | 弱 (需外挂 VLM) | 极强 | 强 | 强 |
-| **适用场景** | 精细操作 (穿针) | 高层语义规划 | 通用操作 | 通用 + 高频控制 |
+| 特性 | Diffusion Policy | RT-2 | OpenVLA | Pi0 | Pi0.6 | WALL-OSS |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **核心机制** | Denoising | Token Prediction | Token Prediction | Flow Matching | **Recap (RL)** | **Dual Heads (Flow+FAST)** |
+| **动作空间** | 连续 | 离散 (256) | 离散 (256) | 连续 | 连续 + Expert | **连续 + 离散** |
+| **Backbone** | CNN/ViT | PaLI-X | Llama 2 | PaliGemma 3B | **5B VLM** | **VLM** |
+| **推理速度** | 慢 | 极慢 | 中等 | 快 | **极快 (Expert)** | **快 (FAST) / 精 (Flow)** |
+| **语义能力** | 弱 | 极强 | 强 | 强 | **最强** | **强 (CoT)** |
+| **适用场景** | 精细操作 | 高层规划 | 通用操作 | 通用控制 | **自我进化** | **长序列推理** |
 
 
 ---

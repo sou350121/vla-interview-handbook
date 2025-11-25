@@ -39,12 +39,12 @@
 ├── README.md                   # 项目主页 (Introduction & Roadmap)
 ├── theory/                     # 理论基础
 │   ├── README.md               # 索引
-│   ├── vla_arch.md             # VLA 核心架构 (RT-1, RT-2, OpenVLA, Pi, Wall-X)
+│   ├── vla_arch.md             # VLA 核心架构 (RT-1, RT-2, OpenVLA, Pi, WALL-OSS)
 │   ├── transformer_vs_cnn.md   # Backbone 对比 (ViT vs ResNet, SigLIP)
 │   ├── action_representations.md # 动作生成范式 (Tokenization vs Diffusion vs Flow)
 │   ├── diffusion_policy.md     # 扩散策略详解 (DDPM, DDIM, EBM)
 │   ├── flash_attention.md      # 性能优化 (Kernel Fusion)
-│   ├── literature_review.md    # 核心文献技术归纳 (RT-2, OpenVLA, Pi0/0.5/0.6)
+│   ├── literature_review.md    # 核心文献技术归纳 (RT-2, OpenVLA, Pi0/0.5/0.6, WALL-OSS)
 │   ├── pi0_flow_matching.md    # Pi0 代码解构 (Flow Matching)
 │   ├── pi0_5_dissection.md     # Pi0.5 模型解剖 (Unified Model)
 │   ├── pi0_6_dissection.md     # Pi0.6 模型解剖 (Recap RL)

@@ -5,7 +5,7 @@
 ## 目录
 1. **[关键论文时间线 (Timeline)](./timeline.md)**
     - Classic: CLIP, RT-1, RT-2
-    - Recent: OpenVLA, Wall-X, Pi Models (π0, π0.5, π0.6)
+    - Recent: OpenVLA, WALL-OSS, Pi Models (π0, π0.5, π0.6)
 2. **[核心公式 (Formulas)](./formulas.md)**
     - Attention, Diffusion Policy, Flow Matching
     - LoRA, 坐标变换, 四元数

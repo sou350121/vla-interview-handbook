@@ -6,7 +6,7 @@
 
 ### 1. 基础架构 (Foundations)
 构建 VLA 模型的基石，包括骨干网络选择、动作表示和数据处理。
-- **[VLA 核心架构 (VLA Core Architectures)](./vla_arch.md)**: RT-1, RT-2, OpenVLA, Wall-X 等主流模型概览。
+- **[VLA 核心架构 (VLA Core Architectures)](./vla_arch.md)**: RT-1, RT-2, OpenVLA, WALL-OSS 等主流模型概览。
 - **[Backbone 对比: Transformer vs CNN](./transformer_vs_cnn.md)**: 为什么 ViT 成为主流？ResNet 还有机会吗？
 - **[动作生成范式 (Action Representations)](./action_representations.md)**: Tokenization (离散) vs Diffusion (连续) vs Flow Matching (流匹配)。
 - **[数据处理 (Data Processing)](./data.md)**: RLDS 格式、数据加权与平衡策略。
