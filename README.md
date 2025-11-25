@@ -19,44 +19,59 @@
 - **Deployment**: 如何在边缘设备 (Jetson) 上部署大模型？
 - **Hardware**: 灵巧手与机械臂的选型与控制。
 
-## 🗺️ 路线图 (Roadmap)
+## ✨ 项目亮点 (Highlights)
 
-本项目包含以下核心模块：
+1. **全中文内容**: 所有文档均使用简体中文编写，专业术语保留英文对照。
+2. **最新技术覆盖**:
+    - 包含了 **Physical Intelligence (Pi)** 的 π0, π0.5, π0.6 模型解析。
+    - 涵盖了 **OpenVLA**, **Wall-X** 等开源 SOTA 模型。
+3. **硬件选型指南**:
+    - 重点加强了 **灵巧手 (Dexterous Hands)** 的介绍。
+    - 提供了 **Unitree, Agibot, Fourier** 等中国头部机器人公司的详细参数与价格参考。
+4. **实战导向**:
+    - 提供了 **Sim-to-Real** 的具体技术路线 (Domain Randomization, Co-training)。
+    - 提供了 **边缘部署** 的实战代码片段 (vLLM, Quantization)。
 
-### 1. [理论基础 (Theory)](./theory/)
-- **VLA 核心架构**: RT-1, RT-2, OpenVLA, Octo, Pi0 (Pi-Zero), Wall-X.
-- **Backbone 对比**: [Transformer (ViT) vs CNN (ResNet)](./theory/transformer_vs_cnn.md) (含 SigLIP, Patchify).
-- **Pi 系列解剖**: [Pi0 代码解构 (Flow Matching)](./theory/pi0_flow_matching.md) (含 OT-CFM, ODE Solvers), [Pi0.5 (Unified Model)](./theory/pi0_5_dissection.md), [Pi0.6 (Recap RL)](./theory/pi0_6_dissection.md).
-- **动作生成范式**: [离散化 vs 扩散 (Diffusion Policy) vs 流匹配 (Flow Matching)](./theory/action_representations.md).
-- **触觉感知**: [Tactile VLA](./theory/tactile_vla.md) (GelSight, VLA-Touch).
-- **扩散策略深度**: [Diffusion Policy 详解](./theory/diffusion_policy.md) (含 EBM 视角, FiLM, Noise Schedulers).
-- **性能优化**: [Flash Attention 原理](./theory/flash_attention.md) (Kernel Fusion, Recomputation).
-- **文献综述**: [核心文献技术归纳](./theory/literature_review.md).
-- **多模态大模型**: CLIP, LLaVA, Flamingo 原理回顾.
-- **数据处理**: [RLDS 格式, 异构数据 Co-training](./theory/data.md).
+## 📂 项目结构 (Project Structure)
 
-### 2. [真机与部署 (Deployment)](./deployment/)
-- **Pi0 真机部署**: [硬件配置与 Remote Inference](./deployment/pi0_deployment.md).
-- **灵巧手实战**: [避坑指南 (通讯, 散热, 线缆)](./deployment/dexterous_hand_guide.md).
-- **模型优化**: 量化 (AWQ, GPTQ), 剪枝.
-- **边缘计算**: TensorRT, ONNX Runtime, vLLM 部署.
-- **Sim-to-Real**: Domain Randomization, 迁移学习.
-- **硬件选型**: **灵巧手 (Dexterous Hands)** 深度解析与价格参考.
-
-### 3. [速查表 (Cheat Sheet)](./cheat-sheet/)
-- **关键论文时间线**: 经典与最新 (近半年) 论文一览.
-- **核心公式**: Attention, Diffusion, Control Theory.
-- **模型对比**: 参数量, 训练数据, 性能指标.
-
-### 4. [系统设计 (System Design)](./system-design/)
-- **数据闭环**: [Data Pipeline Design](./system-design/data_pipeline.md) (Auto-labeling, Active Learning).
-- **云端架构**: [Cloud Infrastructure](./system-design/cloud_infrastructure.md) (Distributed Training, Fleet Management).
-
-### 5. [题库与实战 (Question Bank)](./question-bank/)
-- **概念题**: 理论深度考察.
-- **场景题**: "给定 100 条数据如何训练?"
-- **代码题**: 坐标变换, 基础控制算法实现.
-- **考官视角**: 面试官看重什么能力？
+```
+/opt/vla-interview-handbook/
+├── README.md                   # 项目主页 (Introduction & Roadmap)
+├── theory/                     # 理论基础
+│   ├── README.md               # 索引
+│   ├── vla_arch.md             # VLA 核心架构 (RT-1, RT-2, OpenVLA, Pi, Wall-X)
+│   ├── transformer_vs_cnn.md   # Backbone 对比 (ViT vs ResNet, SigLIP)
+│   ├── action_representations.md # 动作生成范式 (Tokenization vs Diffusion vs Flow)
+│   ├── diffusion_policy.md     # 扩散策略详解 (DDPM, DDIM, EBM)
+│   ├── flash_attention.md      # 性能优化 (Kernel Fusion)
+│   ├── literature_review.md    # 核心文献技术归纳 (RT-2, OpenVLA, Pi0/0.5/0.6)
+│   ├── pi0_flow_matching.md    # Pi0 代码解构 (Flow Matching)
+│   ├── pi0_5_dissection.md     # Pi0.5 模型解剖 (Unified Model)
+│   ├── pi0_6_dissection.md     # Pi0.6 模型解剖 (Recap RL)
+│   └── data.md                 # 数据处理 (RLDS, Co-training)
+├── deployment/                 # 真机与部署
+│   ├── README.md               # 索引
+│   ├── hardware.md             # 硬件选型 (灵巧手, 机械臂)
+│   ├── calibration.md          # 相机标定指南
+│   ├── pi0_deployment.md       # Pi0 真机部署
+│   ├── dexterous_hand_guide.md # 灵巧手部署实战
+│   ├── optimization.md         # 模型优化 (量化, TensorRT)
+│   └── sim_to_real.md          # Sim-to-Real 技术
+├── system-design/              # 系统设计
+│   ├── README.md               # 索引
+│   ├── data_pipeline.md        # 数据闭环设计
+│   ├── cloud_infrastructure.md # 云端基础设施
+│   └── evaluation.md           # 评估系统设计
+├── cheat-sheet/                # 速查表
+│   ├── README.md               # 索引
+│   ├── timeline.md             # 关键论文时间线
+│   └── formulas.md             # 核心公式
+└── question-bank/              # 题库与实战
+    ├── README.md               # 索引
+    ├── questions.md            # 面试真题
+    ├── openvla_finetuning.md   # OpenVLA 微调实战
+    └── interviewer_guide.md    # 考官视角指南
+```
 
 ## 🚀 快速开始 (Getting Started)
 
