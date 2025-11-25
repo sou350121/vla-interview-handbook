@@ -224,3 +224,7 @@ def compute_loss(policy, vlm_cond, real_action):
 - **RK4 (4th order)**: 经典的高精度求解器，需要 4 倍 NFE。
 - **结论**: 在机器人控制中，通常使用 **Euler** (追求极速) 或 **Heun** (追求平衡)。由于 Flow Matching 训练出的向量场非常平滑 (直线)，Euler 方法通常已经足够好用。
 
+
+
+---
+[← Back to Theory](./README.md)

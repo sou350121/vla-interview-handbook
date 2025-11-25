@@ -104,3 +104,7 @@ A: 因为 ViT 缺乏 **归纳偏置 (Inductive Bias)**。CNN 天生知道"相邻
 
 **Q: 什么是 Patchify?**
 A: 将一张图片切成一个个小方块 (e.g., 16x16 像素)，拉平成向量，作为 Transformer 的输入 Token。这相当于 NLP 中的分词 (Tokenization)。
+
+
+---
+[← Back to Theory](./README.md)

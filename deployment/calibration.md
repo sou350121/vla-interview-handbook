@@ -61,3 +61,7 @@ R_cam2gripper, t_cam2gripper = cv2.calibrateHandEye(
     - 将标定结果写入 URDF 或配置文件。
     - 在 Rviz 中显示 PointCloud。
     - 将一个已知物体 (如标定板) 放在桌上，看点云中的标定板是否与机器人的模型 (Mesh) 或真实位置完美重合。
+
+
+---
+[← Back to Deployment](./README.md)

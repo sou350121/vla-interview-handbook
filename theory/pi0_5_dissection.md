@@ -65,3 +65,7 @@
 | **适用场景** | 固定环境重复操作 | **新环境探索，家务** | 工厂流水线，高精度装配 |
 
 > **面试 Tip**: 如果被问到 π0.5 的创新点，重点答 **"Hierarchical Inference" (分层推理)** 和 **"Open-world Generalization" (开放世界泛化)**。它是连接"通识大模型"和"物理执行器"的关键桥梁。
+
+
+---
+[← Back to Theory](./README.md)

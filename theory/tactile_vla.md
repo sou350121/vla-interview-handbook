@@ -86,3 +86,7 @@ A: 触觉图像通常反映的是**几何形状 (Geometry)** 和 **受力分布 
 
 **Q: 如何将触觉融入 VLA?**
 A: 最简单的方法是将触觉图像视为额外的视觉通道 (Concat)，或者使用 Cross-Attention 将触觉特征注入到 Policy 中。最新的趋势是像 OmniVTLA 一样进行多模态对齐。
+
+
+---
+[← Back to Theory](./README.md)

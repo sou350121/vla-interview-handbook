@@ -37,7 +37,23 @@
 2. **动作空间选择**: 使用 **Delta Position Control** (增量位置控制) 通常比 Torque Control (力矩控制) 更容易迁移，因为底层的 PID 控制器屏蔽了部分动力学差异。
 3. **混合训练**: 在仿真数据中混入少量 (e.g., 10%) 的真机数据进行 Co-training，可以显著提升迁移效果。
 
+## 5. 案例分析: Pi0.5 的 Co-training 策略
+Pi0.5 展示了目前最先进的 Sim-to-Real 范式，它不再单纯依赖 Domain Randomization，而是采用 **Data Co-training**。
+
+- **数据配比**:
+    - **Simulation Data**: 用于学习长序列逻辑 (Long-horizon Logic)。仿真数据完美标注，适合学习"先开门，再拿杯子"这种因果关系。
+    - **Internet Videos**: 用于学习物理常识 (World Model)。
+    - **Robot Data**: 用于学习具体的动作执行 (Motor Control)。
+- **效果**:
+    - 仿真数据教会了模型"做什么" (What to do)。
+    - 真机数据教会了模型"怎么做" (How to do)。
+    - 这种组合使得 Pi0.5 能够 Zero-shot 迁移到从未见过的厨房环境。
+
 ## 面试高频考点
 1. **Domain Randomization**: 随机化范围越大越好吗？(答: 不是。范围过大会导致任务过于困难，模型无法收敛。需要根据实际情况调整)
 2. **Visual Gap**: 除了随机化，还有什么方法减小视觉差异？(答: 使用 Real-to-Sim，即用真实图像作为纹理贴图到仿真物体上；或者使用从不依赖纹理的特征，如 Keypoints)
 3. **失败案例**: 举一个 Sim-to-Real 失败的例子。(答: 仿真中摩擦力建模不准，导致抓取物体时滑落；或者线缆的柔性动力学未建模，导致真机运动受阻)
+
+
+---
+[← Back to Deployment](./README.md)

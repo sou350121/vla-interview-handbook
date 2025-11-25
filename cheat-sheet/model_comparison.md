@@ -27,3 +27,7 @@
 
 3.  **Why Pi0?**:
     *   它是目前唯一结合了 **VLM 强语义** (PaliGemma) 和 **Flow Matching 高频控制** 的模型，解决了"脑子慢手快"的矛盾。
+
+
+---
+[← Back to Cheat Sheet](./README.md)

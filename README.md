@@ -30,7 +30,7 @@
     - **性能优化**: [Flash Attention 原理](./theory/flash_attention.md) (Kernel Fusion, Recomputation).
     - **文献综述**: [核心文献技术归纳](./theory/literature_review.md).
 - **多模态大模型**: CLIP, LLaVA, Flamingo 原理回顾.
-- **数据处理**: RLDS 格式, 异构数据 Co-training.
+- **数据处理**: [RLDS 格式, 异构数据 Co-training](./theory/data.md).
 
 ### 2. [真机与部署 (Deployment)](./deployment/)
 - **Pi0 真机部署**: [硬件配置与 Remote Inference](./deployment/pi0_deployment.md).
@@ -45,7 +45,11 @@
 - **核心公式**: Attention, Diffusion, Control Theory.
 - **模型对比**: 参数量, 训练数据, 性能指标.
 
-### 4. [题库与实战 (Question Bank)](./question-bank/)
+### 4. [系统设计 (System Design)](./system-design/)
+- **数据闭环**: [Data Pipeline Design](./system-design/data_pipeline.md) (Auto-labeling, Active Learning).
+- **云端架构**: [Cloud Infrastructure](./system-design/cloud_infrastructure.md) (Distributed Training, Fleet Management).
+
+### 5. [题库与实战 (Question Bank)](./question-bank/)
 - **概念题**: 理论深度考察.
 - **场景题**: "给定 100 条数据如何训练?"
 - **代码题**: 坐标变换, 基础控制算法实现.

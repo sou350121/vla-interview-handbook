@@ -66,3 +66,7 @@ for episode in ds.take(1):
 1. **RLDS**: 简述 RLDS 的数据结构。如何处理不同频率的数据？(答: 插值或下采样)
 2. **数据平衡**: 如果我有 1000 条简单的 Pick-Place 数据和 100 条复杂的 Assembly 数据，应该怎么训练？(答: 重采样 Assembly 数据，提高其在 Batch 中的比例)
 3. **Action Space**: 为什么要用 Delta Action？(答: 减少对绝对坐标的依赖，更容易迁移到不同位置或不同机器人)
+
+
+---
+[← Back to Theory](./README.md)

@@ -104,3 +104,7 @@ A: VLA 的注意力模式通常是密集的（视觉 Patch 之间关系紧密）
 
 **Q: Flash Attention 对训练和推理都有效吗？**
 A: 是的。训练时通过 Recomputation 节省显存，推理时通过 Kernel Fusion 加速。Wall-X 等模型在两者都使用。
+
+
+---
+[← Back to Theory](./README.md)

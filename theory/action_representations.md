@@ -85,3 +85,7 @@ $$
 
 > **面试 Tip**: 如果面试官问 "为什么现在的 VLA 模型开始从 Tokenization 转向 Diffusion/Flow?"
 > **答**: 为了追求**高精度操作** (如穿针、装配)。Tokenization 在处理这种任务时，量化误差是致命的，而 Diffusion/Flow 提供了连续空间的精细控制能力。
+
+
+---
+[← Back to Theory](./README.md)

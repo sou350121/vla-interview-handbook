@@ -58,6 +58,30 @@
     - **ODE Solver**: 训练时学习向量场，推理时使用 **Euler** (极速) 或 **Heun** (高精) 求解。
 - **Key Contribution**: 结合了 VLM 的语义理解和 Flow Matching 的高频精细控制，实现了"大脑"与"小脑"的统一。
 
+## 5. Pi0.5 (Physical Intelligence, 2025)
+> **核心定位**: **Open-World Explorer (开放世界探险家)**
+
+- **核心问题**: 解决机器人无法在从未见过的环境 (Open World) 中泛化的问题。
+- **核心技术**: **Unified Model with Hierarchical Inference**。
+- **架构创新**:
+    - **Latent Thought**: 模型内部生成隐式的高层语义子任务 (Semantic Subtask)，再解码为底层动作。
+    - **Hybrid Architecture**: 训练时使用 **FAST Tokenizer** (离散) 加速，推理时使用 **Flow Matching** (连续) 微调。
+- **Data Strategy**: **Co-training**。混合 Robot Data (高质量) + Internet Videos (世界模型) + Simulation Data (长序列逻辑)。
+- **Key Contribution**: 实现了跨形态 (Cross-Embodiment) 的 Zero-shot 迁移，并显著提升了长序列任务的成功率。
+
+## 6. Pi0.6 (Physical Intelligence, 2025)
+> **核心定位**: **Self-Improving Master (自我进化大师)**
+
+- **核心问题**: 如何超越人类示教的上限，实现极致的熟练度 (Proficiency)。
+- **核心技术**: **Recap Algorithm (Offline RL)**。
+- **架构升级**:
+    - **5B Backbone**: 更强的语义理解。
+    - **Action Expert**: 独立的高频动作生成模块 (小脑)，专门负责精细操作。
+- **Recap 机制**:
+    - 学习失败轨迹 (Failure Cases)，通过 Offline RL 抑制错误动作，奖励成功动作。
+    - 实现了 **Data-Driven Self-Improvement**。
+- **Key Contribution**: 证明了机器人可以通过自我复盘 (Recap) 在操作速度和鲁棒性上超越人类专家。
+
 ### WALL-OSS (2024)
 - **核心创新**: 双动作分支架构 (Dual Action Branches)。
     - **WALL-OSS-FLOW**: 基于 Flow Matching 的连续动作生成。
@@ -68,11 +92,21 @@
 
 ## 总结对比表 (Summary Table)
 
-| 特性 | Diffusion Policy | RT-2 | OpenVLA | Pi0 |
-| :--- | :--- | :--- | :--- | :--- |
+| 特性 | Diffusion Policy | RT-2 | OpenVLA | Pi0 | Pi0.6 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **核心机制** | Denoising | Token Prediction | Token Prediction | Flow Matching | **Recap (RL)** |
+| **动作空间** | 连续 | 离散 (256) | 离散 (256) | 连续 | 连续 + Expert |
+| **Backbone** | CNN/ViT | PaLI-X | Llama 2 | PaliGemma 3B | **5B VLM** |
+| **推理速度** | 慢 | 极慢 | 中等 | 快 | **极快 (Expert)** |
+| **语义能力** | 弱 | 极强 | 强 | 强 | **最强** |
+| **适用场景** | 精细操作 | 高层规划 | 通用操作 | 通用控制 | **自我进化** |
 | **核心机制** | Denoising (去噪) | Token Prediction (分类) | Token Prediction (分类) | Flow Matching (ODE) |
 | **动作空间** | 连续 (Continuous) | 离散 (Discrete 256) | 离散 (Discrete 256) | 连续 (Continuous) |
 | **Backbone** | CNN / Transformer | PaLI-X / PaLM-E | Llama 2 + SigLIP | PaliGemma 3B |
 | **推理速度** | 慢 (需加速) | 极慢 (大模型) | 中等 (7B) | 快 (Flow) |
 | **语义能力** | 弱 (需外挂 VLM) | 极强 | 强 | 强 |
 | **适用场景** | 精细操作 (穿针) | 高层语义规划 | 通用操作 | 通用 + 高频控制 |
+
+
+---
+[← Back to Theory](./README.md)

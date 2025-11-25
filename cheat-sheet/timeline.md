@@ -37,3 +37,7 @@
 1. **入门**: CLIP -> RT-1 -> RT-2
 2. **实战**: OpenVLA (代码必读)
 3. **进阶**: Octo (Diffusion Policy), Pi Models (物理理解)
+
+
+---
+[← Back to Cheat Sheet](./README.md)

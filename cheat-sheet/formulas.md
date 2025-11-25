@@ -101,3 +101,7 @@ f = \frac{1}{\Delta t} \quad (\text{Hz})
 $$
 - VLA 通常运行在 3Hz - 10Hz (高层规划)。
 - 底层关节控制通常需要 500Hz - 1000Hz (由 PD 控制器处理)。
+
+
+---
+[← Back to Cheat Sheet](./README.md)
