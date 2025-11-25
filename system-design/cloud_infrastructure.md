@@ -23,13 +23,13 @@
         - **本地缓存**: 训练开始前将数据预加载到计算节点的 NVMe SSD。
 
 ## 2. 持续评估 (Continuous Evaluation)
+## 2. 持续评估 (Continuous Evaluation)
+> **Deep Dive**: 详见 **[评估系统设计 (Evaluation System)](./evaluation.md)**。
+
 模型训好了，怎么知道它变强了？
-- **Simulation Benchmark**:
-    - 在 Isaac Sim / ManiSkill 中运行标准测试集 (e.g., Pick, Place, Open Drawer)。
-    - 自动化脚本计算 Success Rate。
-- **Real-world Proxy**:
-    - 使用一个预留的 "验证集" (Validation Set)，计算 Action Prediction Loss。
-    - **注意**: Loss 降低不代表成功率提高 (Goodhart's Law)。必须结合仿真测试。
+- **Simulation Benchmark**: 在 Isaac Sim / ManiSkill 中运行自动化测试。
+- **Real-world Proxy**: 计算 Action Prediction Loss，但要注意 **Goodhart's Law** (Loss 降低 $\neq$ 成功率提高)。
+- **A/B Testing**: 灰度发布到真机车队。
 
 ## 3. 车队管理 (Fleet Management)
 - **OTA (Over-the-Air) Updates**:
