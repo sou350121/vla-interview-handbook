@@ -10,15 +10,15 @@
 
 ```mermaid
 graph LR
-    A[Robot Fleet] -->|Raw Logs| B(Ingestion Service)
-    B -->|Storage| C[(Data Lake / S3)]
-    C --> D{Data Selection}
-    D -->|High Value| E[Auto-Labeling (VLM)]
-    E -->|Low Confidence| F[Human Annotation]
-    E -->|High Confidence| G[(Training Dataset)]
+    A["Robot Fleet"] -->|"Raw Logs"| B("Ingestion Service")
+    B -->|"Storage"| C[("Data Lake / S3")]
+    C --> D{"Data Selection"}
+    D -->|"High Value"| E["Auto-Labeling (VLM)"]
+    E -->|"Low Confidence"| F["Human Annotation"]
+    E -->|"High Confidence"| G[("Training Dataset")]
     F --> G
-    G --> H[Training Cluster]
-    H -->|New Model| A
+    G --> H["Training Cluster"]
+    H -->|"New Model"| A
 ```
 
 ## 3. 关键模块设计
