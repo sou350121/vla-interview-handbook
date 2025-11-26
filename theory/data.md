@@ -9,15 +9,19 @@
 ### 1.1. RLDS (Robotics Language-Image Datasets)
 - **生态位**: **Google / Open X-Embodiment 标准**。
 - **底层**: 基于 `TensorFlow Datasets (TFDS)` 和 `ProtoBuf`。
+- **物理格式**: **`.tfrecord`** 文件。
+    - 这是一种基于行 (Row-based) 的二进制序列化格式，将数据序列化为 Protocol Buffers 消息。
 - **特点**:
-    - **序列化**: 数据被序列化为 `.tfrecord` 文件，适合大规模分布式读取。
+    - **序列化**: 适合大规模分布式读取，Google TPU 友好。
     - **标准化**: 强制定义了 `observation`, `action`, `language` 的标准接口。
     - **流式读取**: 支持云端存储 (GCS) 的流式训练，无需下载整个数据集。
 - **适用场景**: 使用 TPU 训练，或基于 RT-1/RT-2/Octo 架构开发时。
 
 ### 1.2. LeRobot Dataset (Hugging Face)
 - **生态位**: **PyTorch / Open Source 社区新标准**。
-- **底层**: 基于 `Parquet` (列式存储) 和 `Hugging Face Datasets`。
+- **底层**: 基于 `Parquet` (列式存储) 和 `Hugging Face Datasets` (Apache Arrow)。
+- **物理格式**: **`.parquet`** 文件。
+    - 这是一种基于列 (Column-based) 的存储格式，压缩率极高，读取特定列（如只读 Action 不读 Image）非常快。
 - **特点**:
     - **可视化**: 在 Hugging Face 网页端可直接预览视频和元数据。
     - **轻量级**: 不依赖 TensorFlow，安装简单 (`pip install lerobot`)。
@@ -27,10 +31,12 @@
 ### 1.3. HDF5 / Robomimic
 - **生态位**: **传统科研 / 仿真数据标准**。
 - **底层**: `HDF5` (Hierarchical Data Format)。
+- **物理格式**: **`.hdf5`** 或 **`.h5`** 文件。
+    - 类似于一个"文件系统"，内部可以像文件夹一样组织数据 (Groups/Datasets)。
 - **特点**:
-    - **单文件**: 整个数据集通常是一个巨大的 `.hdf5` 文件。
-    - **随机访问**: 支持高效的随机索引读取。
-    - **结构灵活**: 类似于文件系统的层级结构 (Group/Dataset)。
+    - **单文件**: 整个数据集通常是一个巨大的二进制文件。
+    - **随机访问**: 支持高效的随机索引读取 (Random Access)。
+    - **结构灵活**: 类似于文件系统的层级结构。
 - **缺点**: 不适合超大规模数据集 (TB 级别)，难以流式读取。
 - **适用场景**: 仿真环境 (MuJoCo) 数据收集，小规模真机实验。
 
