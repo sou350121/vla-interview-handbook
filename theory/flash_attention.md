@@ -5,11 +5,11 @@ Flash Attention 是 Transformer 模型（包括 VLA）在部署时的核心优�
 ## 1. 为什么需要 Flash Attention?
 
 ### 标准 Attention 的问题
-标准的 Scaled Dot-Product Attention 公式：
+标准的 Scaled Dot-Product标准 Attention 计算公式：
 
-$$
-\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
-$$
+```
+Attention(Q, K, V) = softmax(Q·K^T / √d_k) · V
+```
 
 - **内存瓶颈**: 计算 $QK^T$ 需要存储 $N \times N$ 的注意力矩阵，其中 $N$ 是序列长度。
 - **实例**: 对于 ViT (序列长度 196), $196 \times 196 = 38,416$ 个浮点数。VLA 中若包含多帧图像，$N$ 可能达到数千。

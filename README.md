@@ -74,20 +74,92 @@
 │   ├── README.md               # 索引
 │   ├── timeline.md             # 关键论文时间线
 │   └── formulas.md             # 核心公式
-└── question-bank/              # 题库与实战
-    ├── README.md               # 索引
-    ├── questions.md            # 面试真题
-    ├── openvla_finetuning.md   # OpenVLA 微调实战
-    └── interviewer_guide.md    # 考官视角指南
+├── question-bank/              # 题库与实战
+│   ├── README.md               # 索引
+│   ├── questions.md            # 面试真题
+│   ├── openvla_finetuning.md   # OpenVLA 微调实战
+│   └── interviewer_guide.md    # 考官视角指南
+└── companies/                  # 🆕 机器人公司与求职
+    ├── README.md               # 求职指南索引
+    ├── china.md                # 中国机器人公司
+    ├── international.md        # 国际机器人公司
+    ├── asia.md                 # 亚洲机器人公司 (SG/JP/TW/KR)
+    └── embodied_ai.md          # 具身智能软件平台
 ```
 
 ## 🚀 快速开始 (Getting Started)
 
-建议按照以下顺序阅读：
-1. 阅读 [理论基础](./theory/README.md) 建立 VLA 知识体系。
-2. 查看 [硬件选型](./deployment/hardware.md) 了解行业现状与设备成本。
-3. 浏览 [速查表](./cheat-sheet/README.md) 复习核心概念。
-4. 挑战 [题库](./question-bank/README.md) 进行模拟面试。
+### 📚 推荐学习路径
+
+####学习者/应届生
+1. **理论先行**: 从 [理论基础](./theory/README.md) 开始
+   - 先读 `vla_arch.md` 和 `literature_review.md` 建立全局视野
+   - 深入 `diffusion_policy.md` 和 `pi0_flow_matching.md` 掌握核心算法
+2. **动手实践**: 挑战 [题库](./question-bank/README.md) 中的 OpenVLA 微调实战
+3. **硬件了解**: 浏览 [硬件选型](./deployment/hardware.md) 了解主流设备
+4. **公司调研**: 查看 [公司目录](./companies/README.md) 规划职业方向
+
+#### 在职转岗/跳槽者
+1. **速查复习**: 先看 [速查表](./cheat-sheet/README.md) 快速回顾核心概念
+2. **深度补充**: 针对性阅读 [理论基础](./theory/README.md) 中的薄弱环节
+   - FAST, Knowledge Insulation 等最新技术
+   - Galaxea G0, WALL-OSS 双系统架构对比
+3. **面试准备**: 刷 [题库](./question-bank/README.md) 模拟真实面试
+4. **目标公司**: 在 [公司目录](./companies/README.md) 中锁定意向公司
+
+#### 面试官/技术Leader
+1. **题库设计**: 参考 [面试官视角](./question-bank/interviewer_guide.md)
+2. **技术深度**: 查阅 [文献综述](./theory/literature_review.md) 了解前沿
+3. **系统设计**: 学习 [系统设计](./system-design/README.md) 评估候选人架构能力
+
+## 🛠️ VLA 开发必备知识 (Development Essentials)
+
+### 数据格式 (Data Formats)
+VLA 领域的标准化数据格式至关重要，以下是最常用的：
+
+#### RLDS (Robotic Learning Datasets Spec)
+- **标准**: Google DeepMind 主导，TensorFlow-based
+- **优势**: 统一格式，Open X-Embodiment 使用
+- **缺点**: 依赖 TensorFlow，对 PyTorch 用户不友好
+- **使用**: RT-1, RT-2, Octo
+
+#### LeRobot Format
+- **标准**: Hugging Face 推出，PyTorch-native
+- **优势**: 与 Transformers 生态无缝集成，易用
+- **缺点**: 相对较新，社区规模尚小
+- **使用**: OpenVLA (可选), WALL-OSS, Galaxea G0
+
+#### 推荐选择
+- **新项目**: 优先 **LeRobot Format** (PyTorch 生态)
+- **兼容性**: 使用 RLDS，但提供 LeRobot 转换脚本
+
+### 仿真环境 (Simulation Platforms)
+| 平台 | 优势 | 劣势 | 适用场景 |
+| :--- | :--- | :--- | :--- |
+| **Isaac Sim (NVIDIA)** | 物理精度高，GPU加速 | 闭源，依赖NVIDIA硬件 | 人形机器人，大规模并行 |
+| **MuJoCo** | 速度快，轻量级 | 接触力模拟有限 | 机械臂操作，快速迭代 |
+| **PyBullet** | 完全开源，易上手 | 物理精度一般 | 学术研究，原型验证 |
+| **Gazebo** | ROS集成好 | 速度慢 | 移动机器人，SLAM |
+
+### 深度学习框架
+- **训练**: **PyTorch** (主流) / JAX (Pi0, Google)
+- **部署**: TensorRT, ONNX Runtime, vLLM
+- **分布式**: PyTorch FSDP, DeepSpeed
+
+### 机器人中间件
+- **ROS 2**: 工业标准，Python/C++ API
+- **Isaac Lab**: NVIDIA 仿真-真机框架
+- **LeRobot**: Hugging Face 端到端工具链
+
+### 硬件控制接口
+- **灵巧手**: CAN Bus, USB, EtherCAT
+- **机械臂**: ROS MoveIt, SDK (如 Franka, UR)
+- **移动底盘**: ROS Navigation Stack
+
+### 版本控制与实验管理
+- **代码**: Git + GitHub/GitLab
+- **数据**: DVC, LFS (大文件)
+- **实验**: Weights & Biases, TensorBoard
 
 ## 🤝 贡献 (Contributing)
 
