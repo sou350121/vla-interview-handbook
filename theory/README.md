@@ -27,6 +27,7 @@
 面试加分项，展示对最新技术的追踪。
 - **[触觉感知与 VLA (Tactile VLA)](./tactile_vla.md)**: VLA-Touch, OmniVTLA, 视触觉融合技术。
 - **[Flash Attention 优化原理](./flash_attention.md)**: 如何解决 Transformer 的内存瓶颈，实现长序列推理。
+- **[Knowledge Insulation (知识绝缘)](./knowledge_insulation.md)**: Pi0 的梯度隔离技术，防止灾难性遗忘，保护 VLM 语义知识。
 
 ### 5. 综合综述 (Literature Review)
 - **[核心文献技术归纳](./literature_review.md)**: 汇总了 Diffusion Policy, Pi0, Wall-X 等关键论文的技术细节。
