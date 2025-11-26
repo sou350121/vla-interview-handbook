@@ -22,6 +22,7 @@
 - **[Pi0.5 模型解剖 (Unified Model)](./pi0_5_dissection.md)**: 统一高层规划与底层控制，开放世界泛化。
 - [Pi0.6 模型解剖 (Recap RL)](./pi0_6_dissection.md): 引入 Offline RL (Recap) 进行自我进化。
 - **[WALL-OSS 深度解析 (Uni-CoT)](./wall_oss.md)**: 统一跨层思维链 (Uni-CoT) 与流匹配控制 (Flow Matching) 的完美结合。
+- **[Galaxea G0 (双系统 VLA)](./galaxea_g0.md)**: G0-VLM + G0-VLA 分层解耦，长时域移动操作专家。
 
 ### 4. 前沿专题 (Advanced Topics)
 面试加分项，展示对最新技术的追踪。
