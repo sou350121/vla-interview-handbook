@@ -84,7 +84,86 @@ action = item['action']
 print(f"Action shape: {action.shape}")
 ```
 
-## 2. 数据加权与平衡 (Data Weighting & Balancing)
+## 3. PyTorch 完整训练流程 (PyTorch Training Pipeline)
+
+在 PyTorch 中训练 VLA 模型，数据流通常遵循以下模式：`Dataset` -> `DataLoader` -> `Model`。
+
+### 3.1. 核心组件
+1.  **Dataset**: 负责读取磁盘上的数据 (RLDS/Parquet)，并进行预处理 (Resize, Normalize)。
+2.  **Processor/Transform**: 处理多模态数据。
+    -   **Image**: `Resize((224, 224))`, `Normalize(mean, std)`.
+    -   **Text**: Tokenizer (如 Llama Tokenizer) 将指令转为 Input IDs.
+    -   **Action**: 归一化到 [-1, 1].
+3.  **DataLoader**: 将多个样本打包成 Batch。需要自定义 `collate_fn` 来处理变长序列 (Padding)。
+
+### 3.2. 代码实战 (Pseudo-code)
+
+```python
+import torch
+from torch.utils.data import Dataset, DataLoader
+from transformers import AutoProcessor
+
+class VLADataset(Dataset):
+    def __init__(self, data_path, processor):
+        self.data = load_data(data_path) # e.g., LeRobotDataset
+        self.processor = processor
+
+    def __getitem__(self, idx):
+        item = self.data[idx]
+        
+        # 1. 获取原始数据
+        image = item['observation.image'] # (C, H, W)
+        text = item['language_instruction'] # "Pick up the apple"
+        action = item['action'] # (Time, Action_Dim)
+        
+        # 2. 多模态预处理 (关键步骤!)
+        # VLA 模型通常需要同时输入图像和文本
+        inputs = self.processor(
+            text=text, 
+            images=image, 
+            return_tensors="pt", 
+            padding="max_length",
+            truncation=True
+        )
+        
+        # 3. 返回字典
+        return {
+            "input_ids": inputs.input_ids.squeeze(),
+            "pixel_values": inputs.pixel_values.squeeze(),
+            "labels": action # 动作作为监督信号
+        }
+
+# 4. 训练循环
+dataset = VLADataset(path, processor)
+dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+model = OpenVLAModel.from_pretrained("openvla/openvla-7b")
+
+for batch in dataloader:
+    # 将数据送入 GPU
+    input_ids = batch["input_ids"].cuda()
+    pixel_values = batch["pixel_values"].cuda()
+    actions = batch["labels"].cuda()
+    
+    # 前向传播
+    # VLA 模型通常计算 Action MSE Loss 或 Cross-Entropy Loss (如果是 Tokenized Action)
+    loss = model(
+        input_ids=input_ids, 
+        pixel_values=pixel_values, 
+        labels=actions
+    ).loss
+    
+    loss.backward()
+    optimizer.step()
+```
+
+### 3.3. 常见坑点 (Pitfalls)
+-   **数据类型**: 确保 Action 是 `float32` (对于 Diffusion/Regression) 或 `long` (对于 Tokenization)。
+-   **图像通道**: PyTorch 默认是 `(C, H, W)`，而有些读取库 (如 OpenCV/PIL) 可能是 `(H, W, C)`，务必检查 `permute`。
+-   **归一化**: 动作必须使用**统计数据 (Statistics)** 进行归一化 (e.g., min-max 或 mean-std)。**推理时必须使用相同的统计数据反归一化**。
+
+---
+
+## 4. 数据加权与平衡 (Data Weighting & Balancing)
 在训练通用 VLA 模型时，通常会混合多种数据集。不同数据集的质量、规模和难度差异巨大，直接混合训练效果往往不佳。
 
 ### 常见策略
@@ -128,11 +207,12 @@ print(f"Action shape: {action.shape}")
     - **Absolute Action**: 预测绝对坐标。精度更高，但依赖标定。
     - **趋势**: VLA 模型通常偏向于使用 **Delta Action (End-effector velocity/pose delta)**。
 
-## 6. 面试高频考点
-1. **数据格式**: RLDS 和 LeRobot 格式有什么区别？为什么 PyTorch 用户现在倾向于 LeRobot？(答: LeRobot 去除了 TF 依赖，原生支持 PyTorch，且基于 Parquet 存储效率高)
-2. **数据平衡**: 如果我有 1000 条简单的 Pick-Place 数据和 100 条复杂的 Assembly 数据，应该怎么训练？(答: 重采样 Assembly 数据，提高其在 Batch 中的比例)
-3. **Action Space**: 为什么要用 Delta Action？(答: 减少对绝对坐标的依赖，更容易迁移到不同位置或不同机器人)
-4. **数据收集**: 相比于 VR 遥操作，主从臂 (Leader-Follower) 有什么优缺点？(答: 主从臂有力反馈，精度高，但成本高且不仅限于异构机器人映射)
+## 7. 面试高频考点
+1.  **数据格式**: RLDS 和 LeRobot 格式有什么区别？为什么 PyTorch 用户现在倾向于 LeRobot？(答: LeRobot 去除了 TF 依赖，原生支持 PyTorch，且基于 Parquet 存储效率高)
+2.  **数据流**: 在 VLA 训练中，Processor 的作用是什么？(答: 同时处理图像归一化和文本 Tokenization，确保多模态对齐)
+3.  **数据平衡**: 如果我有 1000 条简单的 Pick-Place 数据和 100 条复杂的 Assembly 数据，应该怎么训练？(答: 重采样 Assembly 数据，提高其在 Batch 中的比例)
+4.  **Action Space**: 为什么要用 Delta Action？(答: 减少对绝对坐标的依赖，更容易迁移到不同位置或不同机器人)
+5.  **数据收集**: 相比于 VR 遥操作，主从臂 (Leader-Follower) 有什么优缺点？(答: 主从臂有力反馈，精度高，但成本高且不仅限于异构机器人映射)
 
 
 ---
