@@ -9,6 +9,7 @@
 - **[VLA 核心架构 (VLA Core Architectures)](./vla_arch.md)**: RT-1, RT-2, OpenVLA, WALL-OSS 等主流模型概览。
 - **[Backbone 对比: Transformer vs CNN](./transformer_vs_cnn.md)**: 为什么 ViT 成为主流？ResNet 还有机会吗？
 - **[动作生成范式 (Action Representations)](./action_representations.md)**: Tokenization (离散) vs Diffusion (连续) vs Flow Matching (流匹配)。
+- **[FAST 动作 Token 化](./fast.md)**: DCT + BPE 压缩，5 倍训练加速，OpenVLA 的秘密武器。
 - **[数据处理 (Data Processing)](./data.md)**: RLDS 格式、数据加权与平衡策略。
 
 ### 2. 核心算法 (Core Algorithms)

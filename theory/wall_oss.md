@@ -1,68 +1,68 @@
-# WALL-OSS: Igniting VLMs toward the Embodied Space
+# WALL-OSS: 点燃 VLM 走向具身空间
 
 > [!IMPORTANT]
-> **WALL-OSS** (World-Action-Language-Learning – Open Source System) is a significant open-source contribution from **X Square Robot (自变量机器人)**, aiming to bridge the gap between static VLMs and dynamic physical interaction. It is designed to be a "Linux moment" for embodied AI.
+> **WALL-OSS** (World-Action-Language-Learning – Open Source System，世界-动作-语言-学习 开源系统) 是 **X Square Robot (自变量机器人)** 的重要开源贡献，旨在弥合静态 VLM 与动态物理交互之间的鸿沟。它被设计为具身 AI 的 "Linux 时刻"。
 
-## 1. Overview
-WALL-OSS is an end-to-end embodied foundation model that integrates **Vision, Language, and Action (VLA)**. Unlike traditional pipelines that separate perception, planning, and control, WALL-OSS unifies these into a single differentiable system.
+## 1. 概述
+WALL-OSS 是一个端到端的具身基础模型，集成了**视觉、语言和动作 (VLA)**。与传统的将感知、规划和控制分离的流水线不同，WALL-OSS 将这些统一到一个可微分系统中。
 
--   **Developer**: X Square Robot (自变量机器人)
--   **Release Date**: 2025
--   **Core Goal**: Enable robots to understand the world (World), reason about tasks (Language), and execute complex movements (Action) in a unified manner.
--   **Open Source**: [GitHub](https://github.com/X-Square-Robot/wall-x) | [Hugging Face](https://huggingface.co/X-Square-Robot)
+-   **开发者**: X Square Robot (自变量机器人)
+-   **发布日期**: 2025 年
+-   **核心目标**: 使机器人能够理解世界 (World)、推理任务 (Language) 并执行复杂动作 (Action)，以统一的方式。
+-   **开源**: [GitHub](https://github.com/X-Square-Robot/wall-x) | [Hugging Face](https://huggingface.co/X-Square-Robot)
 
-## 2. Core Innovation: Uni-CoT
-The standout feature of WALL-OSS is **Unified Cross-Level Chain-of-Thought (Uni-CoT)**.
+## 2. 核心创新：Uni-CoT
+WALL-OSS 的突出特点是**统一跨层思维链 (Unified Cross-Level Chain-of-Thought, Uni-CoT)**。
 
-Traditional CoT (Chain-of-Thought) in LLMs focuses on semantic reasoning. WALL-OSS extends this to the physical domain:
-1.  **High-Level Reasoning**: Understanding the user's intent (e.g., "Clean the table").
-2.  **Sub-task Decomposition**: Breaking it down (e.g., "Find sponge", "Grasp sponge", "Wipe surface").
-3.  **Fine-Grained Action Synthesis**: Generating the precise joint angles and trajectories (e.g., "Move arm to (x,y,z) with velocity v").
+传统 LLM 中的 CoT (思维链) 专注于语义推理。WALL-OSS 将其扩展到物理领域：
+1.  **高层推理**: 理解用户意图（例如："清洁桌子"）。
+2.  **子任务分解**: 将其分解（例如："找到海绵"、"抓取海绵"、"擦拭表面"）。
+3.  **细粒度动作合成**: 生成精确的关节角度和轨迹（例如："将手臂移动到 (x,y,z)，速度为 v"）。
 
-**Why it matters**: This unifies the "Brain" (Reasoning) and "Cerebellum" (Control) into a single continuous chain, reducing the "modal decoupling" problem where the plan doesn't match the physical reality.
+**为什么重要**: 这将 "大脑"（推理）和 "小脑"（控制）统一到一个连续链中，减少了计划与物理现实不匹配的 "模态解耦" 问题。
 
-## 3. Architecture Deep Dive
-WALL-OSS employs a **Tightly Coupled Multimodal Architecture** with a **Mixture-of-Experts (MoE)** design.
+## 3. 架构深度解析
+WALL-OSS 采用**紧密耦合的多模态架构**，使用**专家混合 (Mixture-of-Experts, MoE)** 设计。
 
-### 3.1. Dual Output Heads
-To handle the different nature of semantic planning (discrete) and motor control (continuous), WALL-OSS uses two specialized heads:
--   **Discrete Action Head**: For high-level decision making and token generation.
--   **Continuous Action Head (Flow Matching)**: For high-frequency, smooth motor control. This uses **Flow Matching** diffusion techniques to generate precise trajectories.
+### 3.1. 双输出头
+为了处理语义规划（离散）和运动控制（连续）的不同性质，WALL-OSS 使用两个专门的头：
+-   **离散动作头**: 用于高层决策和 token 生成。
+-   **连续动作头（流匹配）**: 用于高频、平滑的运动控制。使用**流匹配 (Flow Matching)** 扩散技术生成精确的轨迹。
 
-### 3.2. Task-Routed FFN & Shared Attention
-The model uses a shared attention mechanism to process multimodal inputs (vision + text) but routes the information through different Feed-Forward Networks (FFN) based on the task phase (reasoning vs. acting). This allows the model to specialize without losing the global context.
+### 3.2. 任务路由 FFN 与共享注意力
+模型使用共享注意力机制处理多模态输入（视觉 + 文本），但根据任务阶段（推理 vs. 执行）将信息路由到不同的前馈网络 (FFN)。这允许模型专业化，同时不丢失全局上下文。
 
-## 4. Training Strategy
-The training process is a **Two-Stage Pipeline** designed to mimic human learning:
+## 4. 训练策略
+训练过程是一个**两阶段流水线**，旨在模仿人类学习：
 
-1.  **Inspiration Stage (Alignment)**:
-    -   Focus: Aligning semantic instructions with discrete action priors.
-    -   Goal: Ensure the robot "knows what to do" spatially and semantically.
-    -   Data: Large-scale VLA datasets with discrete action tokens.
+1.  **启发阶段 (Inspiration Stage，对齐)**:
+    -   重点: 将语义指令与离散动作先验对齐。
+    -   目标: 确保机器人在空间和语义上 "知道要做什么"。
+    -   数据: 包含离散动作 token 的大规模 VLA 数据集。
 
-2.  **Integration Stage (Flow Matching)**:
-    -   Focus: Fine-tuning for high-frequency continuous control.
-    -   Technique: **Flow Matching** (a more efficient alternative to standard Diffusion) is used to generate smooth, physically viable trajectories.
-    -   Goal: Ensure the robot "knows how to move" smoothly.
+2.  **整合阶段 (Integration Stage，流匹配)**:
+    -   重点: 针对高频连续控制进行微调。
+    -   技术: 使用**流匹配 (Flow Matching)**（比标准扩散更高效的替代方案）生成平滑、物理上可行的轨迹。
+    -   目标: 确保机器人 "知道如何平滑移动"。
 
-## 5. Data Strategy: Wall-80k
-X Square Robot released **Wall-80k**, a high-quality dataset crucial for training WALL-OSS.
--   **Scale**: 80,000+ trajectories.
--   **Format**: Compatible with **LeRobot** (Hugging Face's standard).
--   **Composition**: A mix of real-world teleoperation data and high-quality simulation data.
--   **Augmentation**: Uses generative video techniques to augment the training data, improving generalization to new environments.
+## 5. 数据策略：Wall-80k
+X Square Robot 发布了 **Wall-80k**，一个对训练 WALL-OSS 至关重要的高质量数据集。
+-   **规模**: 80,000+ 条轨迹。
+-   **格式**: 与 **LeRobot**（Hugging Face 标准）兼容。
+-   **组成**: 真实世界遥操作数据和高质量模拟数据的混合。
+-   **增强**: 使用生成视频技术增强训练数据，提高对新环境的泛化能力。
 
-## 6. Performance & Comparison
-| Feature | WALL-OSS | RT-2 (Google) | OpenVLA |
+## 6. 性能与对比
+| 特性 | WALL-OSS | RT-2 (Google) | OpenVLA |
 | :--- | :--- | :--- | :--- |
-| **Architecture** | MoE + Flow Matching | VLM + Tokenized Actions | VLM + L1 Regression |
-| **Reasoning** | **Uni-CoT (Strong)** | CoT (Semantic only) | Standard |
-| **Control** | **Continuous (Smooth)** | Discrete Tokens (Jittery) | Continuous |
-| **Open Source** | **Yes (Full Stack)** | No | Yes |
-| **Data** | Wall-80k (Public) | Proprietary | Open X-Embodiment |
+| **架构** | MoE + 流匹配 | VLM + Token 化动作 | VLM + L1 回归 |
+| **推理** | **Uni-CoT (强)** | CoT (仅语义) | 标准 |
+| **控制** | **连续（平滑）** | 离散 Token（抖动）| 连续 |
+| **开源** | **是（全栈）** | 否 | 是 |
+| **数据** | Wall-80k（公开）| 专有 | Open X-Embodiment |
 
-## 7. Key Takeaways for Interviews
--   **Uni-CoT is the key**: Remember "Unified Cross-Level Chain-of-Thought". It bridges high-level planning and low-level control.
--   **Flow Matching for Control**: It uses Flow Matching (not just simple diffusion or regression) for generating smooth actions.
--   **MoE Architecture**: Uses Mixture-of-Experts to handle the diverse requirements of vision, language, and action processing.
--   **Data-Centric**: Emphasize the Wall-80k dataset and compatibility with the LeRobot ecosystem.
+## 7. 面试要点
+-   **Uni-CoT 是关键**: 记住 "统一跨层思维链"。它连接了高层规划和低层控制。
+-   **流匹配控制**: 使用流匹配（而不仅仅是简单的扩散或回归）生成平滑动作。
+-   **MoE 架构**: 使用专家混合处理视觉、语言和动作处理的不同需求。
+-   **数据为中心**: 强调 Wall-80k 数据集和与 LeRobot 生态系统的兼容性。
