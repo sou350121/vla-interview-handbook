@@ -2,31 +2,58 @@
 
 在 VLA 模型的训练中，数据是核心壁垒。本章介绍机器人学习中通用的数据格式和处理策略。
 
-## 1. RLDS (Robotics Language-Image Datasets)
-> **定义**: Google DeepMind 推出的一种用于机器人学习的标准数据格式，旨在统一不同数据集的接口，方便大规模训练。
+## 1. 主流数据格式对比 (Mainstream Data Formats)
 
-### 核心结构
-RLDS 将数据组织为 `Episodes` (回合) 和 `Steps` (步)。
-- **Episode**: 一次完整的任务执行过程 (e.g., 抓取一个苹果)。包含元数据 (Metadata) 如任务描述、成功/失败标签。
-- **Step**: 每一个时间步的数据。
-    - `observation`:
-        - `image`: 摄像头图像 (RGB, Depth).
-        - `state`: 机器人本体状态 (关节角, 夹爪开度, TCP 坐标).
-        - `language_instruction`: 语言指令 (e.g., "Pick up the apple").
-    - `action`: 机器人执行的动作 (e.g., 目标关节角, 速度, 扭矩).
-    - `reward`: 奖励值 (通常用于 RL).
-    - `is_terminal`: 是否结束.
+在 VLA 领域，数据格式的选择直接影响训练效率和生态兼容性。目前主要有三种主流格式：
 
-### 为什么使用 RLDS?
-1. **标准化**: 解决了不同数据集 (Bridge, RT-1, Language-Table) 格式不一致的问题。
-2. **TFDS 集成**: 基于 TensorFlow Datasets，支持高效的流式读取 (Streaming) 和 缓存 (Caching)。
-3. **Open X-Embodiment**: 全球最大的机器人数据集 OXE 就是基于 RLDS 格式发布的。
+### 1.1. RLDS (Robotics Language-Image Datasets)
+- **生态位**: **Google / Open X-Embodiment 标准**。
+- **底层**: 基于 `TensorFlow Datasets (TFDS)` 和 `ProtoBuf`。
+- **特点**:
+    - **序列化**: 数据被序列化为 `.tfrecord` 文件，适合大规模分布式读取。
+    - **标准化**: 强制定义了 `observation`, `action`, `language` 的标准接口。
+    - **流式读取**: 支持云端存储 (GCS) 的流式训练，无需下载整个数据集。
+- **适用场景**: 使用 TPU 训练，或基于 RT-1/RT-2/Octo 架构开发时。
 
-### 代码示例 (Loading RLDS)
+### 1.2. LeRobot Dataset (Hugging Face)
+- **生态位**: **PyTorch / Open Source 社区新标准**。
+- **底层**: 基于 `Parquet` (列式存储) 和 `Hugging Face Datasets`。
+- **特点**:
+    - **可视化**: 在 Hugging Face 网页端可直接预览视频和元数据。
+    - **轻量级**: 不依赖 TensorFlow，安装简单 (`pip install lerobot`)。
+    - **PyTorch 原生**: 数据加载器直接输出 PyTorch Tensors。
+- **适用场景**: 使用 GPU 训练，基于 OpenVLA/ACT/Diffusion Policy 开发新项目时。
+
+### 1.3. HDF5 / Robomimic
+- **生态位**: **传统科研 / 仿真数据标准**。
+- **底层**: `HDF5` (Hierarchical Data Format)。
+- **特点**:
+    - **单文件**: 整个数据集通常是一个巨大的 `.hdf5` 文件。
+    - **随机访问**: 支持高效的随机索引读取。
+    - **结构灵活**: 类似于文件系统的层级结构 (Group/Dataset)。
+- **缺点**: 不适合超大规模数据集 (TB 级别)，难以流式读取。
+- **适用场景**: 仿真环境 (MuJoCo) 数据收集，小规模真机实验。
+
+### 📊 格式对比表
+
+| 特性 | RLDS | LeRobot | HDF5 |
+| :--- | :--- | :--- | :--- |
+| **背书机构** | Google DeepMind | Hugging Face | Stanford (Robomimic) |
+| **核心依赖** | TensorFlow | PyTorch / Arrow | h5py |
+| **存储格式** | TFRecord (序列化) | Parquet (列式) | HDF5 (层级) |
+| **流式读取** | ⭐⭐⭐ (原生支持) | ⭐⭐ (支持) | ⭐ (困难) |
+| **生态兼容** | Open X-Embodiment | Transformers / Hub | Simulators |
+| **推荐指数** | ⭐⭐⭐ (大规模/TPU) | ⭐⭐⭐ (新项目首选) | ⭐⭐ (科研/仿真) |
+
+---
+
+## 2. 代码示例：如何加载数据
+
+### 2.1. Loading RLDS (TensorFlow)
 ```python
 import tensorflow_datasets as tfds
 
-# 加载数据集
+# 加载 Open X-Embodiment 中的 fractal 数据
 ds = tfds.load('fractal20220817_data', split='train')
 
 for episode in ds.take(1):
@@ -34,7 +61,21 @@ for episode in ds.take(1):
     for step in steps:
         image = step['observation']['image']
         action = step['action']
-        # Training logic here...
+        # 需要手动转换为 PyTorch Tensor 如果不用 TF
+```
+
+### 2.2. Loading LeRobot (PyTorch)
+```python
+from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
+
+# 直接从 Hugging Face Hub 加载
+dataset = LeRobotDataset("lerobot/pusht")
+
+# 像标准的 PyTorch Dataset 一样使用
+item = dataset[0]
+image = item['observation.image']  # 自动归一化并转为 Tensor (C, H, W)
+action = item['action']
+print(f"Action shape: {action.shape}")
 ```
 
 ## 2. 数据加权与平衡 (Data Weighting & Balancing)
@@ -52,7 +93,26 @@ for episode in ds.take(1):
     - 在训练批次 (Batch) 中，固定比例 (e.g., 50%) 混合 VQA (Visual Question Answering) 或 Captioning 数据。
     - **目的**: 维持 VLM backbone 的视觉语言理解能力，防止过拟合到机器人数据分布上 (Catastrophic Forgetting)。
 
-## 3. 动作空间对齐 (Action Space Alignment)
+## 4. 数据收集工具链 (Data Collection Tools)
+
+高质量的数据源于高效的收集工具。
+
+### 4.1. 遥操作 (Teleoperation)
+- **VR 头显 (Vision Pro / Quest 3)**:
+    - **优势**: 沉浸感强，能收集 6-DoF 姿态，适合灵巧手操作。
+    - **方案**: ALOHA (VR版), AnyTeleop。
+- **主从臂 (Leader-Follower Arms)**:
+    - **优势**: 力反馈真实，操作精度极高。
+    - **方案**: ALOHA (使用 WidowX 作为主臂), GELLO (低成本 3D 打印主臂)。
+- **手柄/3D 鼠标**:
+    - **优势**: 成本低，易获取。
+    - **劣势**: 难以控制高自由度 (如灵巧手)。
+
+### 4.2. 自动化收集 (Autonomous Collection)
+- **Scripted Policy**: 在仿真或简单场景中，用硬编码脚本生成数据。
+- **Self-Replay**: 机器人回放成功的轨迹，并添加噪声进行数据增强。
+
+## 5. 动作空间对齐 (Action Space Alignment)
 不同机器人的动作空间不同 (e.g., 7-DoF 机械臂 vs 14-DoF 双臂 vs 四足)。
 
 - **归一化 (Normalization)**: 将所有动作维度归一化到 [-1, 1] 或 [0, 1]。
@@ -62,10 +122,11 @@ for episode in ds.take(1):
     - **Absolute Action**: 预测绝对坐标。精度更高，但依赖标定。
     - **趋势**: VLA 模型通常偏向于使用 **Delta Action (End-effector velocity/pose delta)**。
 
-## 面试高频考点
-1. **RLDS**: 简述 RLDS 的数据结构。如何处理不同频率的数据？(答: 插值或下采样)
+## 6. 面试高频考点
+1. **数据格式**: RLDS 和 LeRobot 格式有什么区别？为什么 PyTorch 用户现在倾向于 LeRobot？(答: LeRobot 去除了 TF 依赖，原生支持 PyTorch，且基于 Parquet 存储效率高)
 2. **数据平衡**: 如果我有 1000 条简单的 Pick-Place 数据和 100 条复杂的 Assembly 数据，应该怎么训练？(答: 重采样 Assembly 数据，提高其在 Batch 中的比例)
 3. **Action Space**: 为什么要用 Delta Action？(答: 减少对绝对坐标的依赖，更容易迁移到不同位置或不同机器人)
+4. **数据收集**: 相比于 VR 遥操作，主从臂 (Leader-Follower) 有什么优缺点？(答: 主从臂有力反馈，精度高，但成本高且不仅限于异构机器人映射)
 
 
 ---
