@@ -75,7 +75,32 @@ VLA 算法通常需要机械臂作为载体。
 
 ---
 
-## 6. 国际头部机器人公司概览 (International)
+## 6. 亚洲其他头部机器人公司概览 (Asian - SG/JP/TW/KR)
+
+| 国家/地区 | 公司 | 核心产品 | 领域 | 融资/规模 (Est.) | 地点 (HQ) | 备注 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Singapore** | **LionsBot** | LeoBot | 清洁 | **Series A** | Singapore | 专注于商业清洁机器人，设计独特，获多项创新奖。 |
+| | **Eureka Robotics** | Archimedes | 精密操作 | **Series A** | Singapore | 专注于高精度光学/电子制造自动化，"High Accuracy, High Agility"。 |
+| | **KABAM Robotics** | Co-exist | 安防/服务 | **Series A** | Singapore | 专注于安防机器人，AI 驱动的自主巡逻。 |
+| | **Augmentus** | No-code Platform | 工业软件 | **Seed/Series A** | Singapore | 无代码机器人编程平台，降低工业机器人使用门槛。 |
+| | **OtsaW** | O-R3 | 安防/配送 | **Series A** | Singapore | 提供最后一公里配送和安防巡逻解决方案。 |
+| **Japan** | **SoftBank Robotics** | Pepper, Whiz | 服务 | **Giant** | Tokyo | 曾经的 Pepper 缔造者，现专注于清洁 (Whiz) 和餐饮服务机器人。 |
+| | **Toyota (TRI)** | Busboy, T-HR3 | 服务/人形 | **Giant** | Toyota City | 致力于家庭服务机器人，TRI 正在研发下一代 AI 驱动的人形机器人。 |
+| | **Kawasaki Robotics** | Kaleido | 工业/人形 | **Giant** | Akashi | 工业机器人巨头，Kaleido 是其研发的全尺寸人形机器人。 |
+| | **Cyberdyne** | HAL | 外骨骼 | **Public (7779.T)** | Tsukuba | 医疗/康复外骨骼领域的先驱，HAL 系统全球闻名。 |
+| | **Omron** | MoMa | 工业/移动 | **Giant** | Kyoto | 自动化巨头，擅长移动操作复合机器人 (MoMa)。 |
+| **Taiwan** | **Techman Robot (达明)** | TM Robot | 协作 (Cobot) | **Public (6585.TW)** | Taoyuan | 广达集团旗下，全球第二大协作机器人厂商，自带视觉系统。 |
+| | **Delta (台达电)** | SCARA, Articulated | 工业 | **Giant** | Taipei | 电源与自动化巨头，提供完整的工业机器人解决方案。 |
+| | **Advantech (研华)** | AMR/Controller | 工业/计算 | **Giant** | Taipei | 工业电脑龙头，提供机器人控制器和 AMR 解决方案。 |
+| | **HIWIN (上银)** | Ballscrew, Robot | 核心部件 | **Giant** | Taichung | 传动控制专家，也生产工业机器人和医疗复健机器人。 |
+| | **BenQ (佳世达)** | MiBot | 服务/医疗 | **Giant** | Taoyuan | 专注于医疗运输机器人和智能医院解决方案。 |
+| **South Korea** | **Rainbow Robotics** | HUBO, RB-Y1 | 人形/协作 | **Public (277810.KQ)** | Daejeon | KAIST 孵化，Samsung 投资。HUBO 曾获 DARPA 挑战赛冠军。 |
+| | **Doosan Robotics** | M/A/H Series | 协作 (Cobot) | **Public (454910.KQ)** | Suwon | 韩国最大的协作机器人厂商，产品线覆盖广泛。 |
+| | **Hyundai Motor** | Spot, Atlas | 工业/人形 | **Giant** | Seoul | 收购了 Boston Dynamics，致力于移动出行与机器人的结合。 |
+| | **LG Electronics** | CLOi | 服务 | **Giant** | Seoul | 广泛布局服务机器人 (CLOi 系列)，涵盖配送、导引、清洁。 |
+| | **Neuromeka** | Indy | 协作 (Cobot) | **Public (348340.KQ)** | Seoul | 专注于低成本、易用的协作机器人，Indy 系列颇受欢迎。 |
+
+## 7. 国际头部机器人公司概览 (International)
 
 | 公司 | 核心产品 | 领域 | 融资/规模 (Est.) | 地点 (HQ/Branches) | 备注 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -86,10 +111,23 @@ VLA 算法通常需要机械臂作为载体。
 | **1X Technologies (Norway)** | Eve, Neo | 人形 (轮式/双足) | **B轮 ($100M)** | Moss, Norway (HQ) / Sunnyvale, CA | OpenAI 投资，Eve 是轮式人形，Neo 是双足。强调安全与家庭应用。 |
 | **Sanctuary AI (Canada)** | Phoenix | 人形 | **B轮 ($140M+)** | Vancouver, Canada (HQ) | 强调通用智能 (General Purpose)，Phoenix 拥有极强的灵巧手操作能力。 |
 | **Apptronik (US)** | Apollo | 人形 | **A轮 ($14.6M+)** | Austin, TX (HQ) | NASA 背景，Apollo 设计紧凑，与 Mercedes-Benz 合作。 |
-| **Physical Intelligence (US)** | π0 (Model) | 具身智能 | **Seed ($400M)** | San Francisco, CA (HQ) | 专注于通用机器人基础模型 (Software-first)，不造本体，赋能所有机器人。 |
-| **Skild AI (US)** | Skild Brain | 具身智能 | **A轮 ($300M)** | Pittsburgh, PA (HQ) | 也是 Software-first，致力于构建通用的 "机器人大脑"。 |
-| **Hugging Face (US/France)** | LeRobot | 开源社区 | **C轮 ($235M)** | New York, NY (HQ) / Paris, France | 推动具身智能的开源化 (Open Source)，类似 Transformers 库的地位。 |
+
+## 8. 具身智能软件与平台 (Embodied AI Software & Platforms)
+
+| 公司 | 核心产品 | 领域 | 融资/规模 (Est.) | 地点 (HQ) | 备注 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **NVIDIA (US)** | Project GR00T | Foundation Model | **Giant** | Santa Clara, CA | 专为人形机器人打造的通用基础模型，结合 Isaac Lab 仿真平台。 |
+| **Covariant (US)** | RFM-1 | Foundation Model | **Series C ($222M)** | Berkeley, CA | 孵化自 OpenAI 早期团队，RFM-1 是首个机器人基础模型。 |
+| **Intrinsic (Alphabet)** | Flowstate | OS/Platform | **Giant** | Mountain View, CA | Google X 孵化，收购了 Vicarious，致力于机器人软件操作系统的标准化。 |
+| **Physical Intelligence (US)** | π0 (Model) | Foundation Model | **Seed ($400M)** | San Francisco, CA | 专注于通用机器人基础模型 (Software-first)，不造本体，赋能所有机器人。 |
+| **Skild AI (US)** | Skild Brain | Foundation Model | **Series A ($300M)** | Pittsburgh, PA | 也是 Software-first，致力于构建通用的 "机器人大脑"。 |
+| **Hugging Face (US/France)** | LeRobot | Open Source | **Series C ($235M)** | NY / Paris | 推动具身智能的开源化 (Open Source)，类似 Transformers 库的地位。 |
+| **Standard Bots (US)** | RO1 | Cobot/AI | **Series B ($63M)** | Glen Cove, NY | 极简易用的协作机器人，深度集成 GPT-4o 进行自然语言控制。 |
+| **MagicLab (魔法实验室)** | MagicBot | Embodied AI | **Series B** | Wuxi, China | 专注于通用具身智能机器人研发，获阿里/美团投资。 |
+| **Machina Labs (US)** | Roboforming | Manufacturing | **Series B** | Los Angeles, CA | AI 驱动的机器人金属成型技术，以此革新制造业。 |
+
 
 ---
 [← Back to Deployment](./README.md)
+
 
