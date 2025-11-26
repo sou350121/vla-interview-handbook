@@ -77,18 +77,18 @@ VLA 算法通常需要机械臂作为载体。
 
 ## 6. 国际头部机器人公司概览 (International)
 
-| 公司 | 核心产品 | 领域 | 融资/规模 (Est.) | 备注 |
-| :--- | :--- | :--- | :--- | :--- |
-| **Tesla (US)** | Optimus (Gen 2) | 人形 | **上市巨头** | 拥有最强的量产制造能力和 FSD 数据闭环，行业风向标。 |
-| **Figure AI (US)** | Figure 01/02 | 人形 | **B轮 ($675M)** | OpenAI/Microsoft/NVIDIA 投资，端到端模型能力强，落地 BMW 工厂。 |
-| **Boston Dynamics (US)** | Atlas (Electric) | 人形, 四足 | **Hyundai 收购** | 运动控制 (Control) 的天花板，液压转电驱后更适合商业化。 |
-| **Agility Robotics (US)** | Digit | 人形 (双足) | **B轮+ ($150M+)** | Amazon 投资，专注物流场景，Digit 已在亚马逊仓库试运行。 |
-| **1X Technologies (Norway)** | Eve, Neo | 人形 (轮式/双足) | **B轮 ($100M)** | OpenAI 投资，Eve 是轮式人形，Neo 是双足。强调安全与家庭应用。 |
-| **Sanctuary AI (Canada)** | Phoenix | 人形 | **B轮 ($140M+)** | 强调通用智能 (General Purpose)，Phoenix 拥有极强的灵巧手操作能力。 |
-| **Apptronik (US)** | Apollo | 人形 | **A轮 ($14.6M+)** | NASA 背景，Apollo 设计紧凑，与 Mercedes-Benz 合作。 |
-| **Physical Intelligence (US)** | π0 (Model) | 具身智能 | **Seed ($400M)** | 专注于通用机器人基础模型 (Software-first)，不造本体，赋能所有机器人。 |
-| **Skild AI (US)** | Skild Brain | 具身智能 | **A轮 ($300M)** | 也是 Software-first，致力于构建通用的 "机器人大脑"。 |
-| **Hugging Face (US/France)** | LeRobot | 开源社区 | **C轮 ($235M)** | 推动具身智能的开源化 (Open Source)，类似 Transformers 库的地位。 |
+| 公司 | 核心产品 | 领域 | 融资/规模 (Est.) | 地点 (HQ/Branches) | 备注 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Tesla (US)** | Optimus (Gen 2) | 人形 | **上市巨头** | Palo Alto, CA / Austin, TX (HQ) | 拥有最强的量产制造能力和 FSD 数据闭环，行业风向标。 |
+| **Figure AI (US)** | Figure 01/02 | 人形 | **B轮 ($675M)** | Sunnyvale, CA (HQ) | OpenAI/Microsoft/NVIDIA 投资，端到端模型能力强，落地 BMW 工厂。 |
+| **Boston Dynamics (US)** | Atlas (Electric) | 人形, 四足 | **Hyundai 收购** | Waltham, MA (HQ) | 运动控制 (Control) 的天花板，液压转电驱后更适合商业化。 |
+| **Agility Robotics (US)** | Digit | 人形 (双足) | **B轮+ ($150M+)** | Corvallis, OR (HQ) / Pittsburgh / Palo Alto | Amazon 投资，专注物流场景，Digit 已在亚马逊仓库试运行。 |
+| **1X Technologies (Norway)** | Eve, Neo | 人形 (轮式/双足) | **B轮 ($100M)** | Moss, Norway (HQ) / Sunnyvale, CA | OpenAI 投资，Eve 是轮式人形，Neo 是双足。强调安全与家庭应用。 |
+| **Sanctuary AI (Canada)** | Phoenix | 人形 | **B轮 ($140M+)** | Vancouver, Canada (HQ) | 强调通用智能 (General Purpose)，Phoenix 拥有极强的灵巧手操作能力。 |
+| **Apptronik (US)** | Apollo | 人形 | **A轮 ($14.6M+)** | Austin, TX (HQ) | NASA 背景，Apollo 设计紧凑，与 Mercedes-Benz 合作。 |
+| **Physical Intelligence (US)** | π0 (Model) | 具身智能 | **Seed ($400M)** | San Francisco, CA (HQ) | 专注于通用机器人基础模型 (Software-first)，不造本体，赋能所有机器人。 |
+| **Skild AI (US)** | Skild Brain | 具身智能 | **A轮 ($300M)** | Pittsburgh, PA (HQ) | 也是 Software-first，致力于构建通用的 "机器人大脑"。 |
+| **Hugging Face (US/France)** | LeRobot | 开源社区 | **C轮 ($235M)** | New York, NY (HQ) / Paris, France | 推动具身智能的开源化 (Open Source)，类似 Transformers 库的地位。 |
 
 ---
 [← Back to Deployment](./README.md)
