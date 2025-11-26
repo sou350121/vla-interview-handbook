@@ -24,10 +24,13 @@
 1. **全中文内容**: 所有文档均使用简体中文编写，专业术语保留英文对照。
 2. **最新技术覆盖**:
     - 包含了 **Physical Intelligence (Pi)** 的 π0, π0.5, π0.6 模型解析。
-    - 涵盖了 **OpenVLA**, **Wall-X** 等开源 SOTA 模型。
+    - 涵盖了 **OpenVLA**, **WALL-OSS** (X Square), **Galaxea G0** (星海图) 等开源 SOTA 模型。
+    - 详解了 **FAST** 动作 Token 化（DCT + BPE，5倍训练加速）。
+    - 深入讲解 **Knowledge Insulation**（梯度隔离，防止灾难性遗忘）。
 3. **硬件选型指南**:
     - 重点加强了 **灵巧手 (Dexterous Hands)** 的介绍。
     - 提供了 **Unitree, Agibot, Fourier** 等中国头部机器人公司的详细参数与价格参考。
+    - 新增 **国际机器人公司** 和 **亚洲机器人公司** 对比表。
 4. **实战导向**:
     - 提供了 **Sim-to-Real** 的具体技术路线 (Domain Randomization, Co-training)。
     - 提供了 **边缘部署** 的实战代码片段 (vLLM, Quantization)。
@@ -42,12 +45,17 @@
 │   ├── vla_arch.md             # VLA 核心架构 (RT-1, RT-2, OpenVLA, Pi, WALL-OSS)
 │   ├── transformer_vs_cnn.md   # Backbone 对比 (ViT vs ResNet, SigLIP)
 │   ├── action_representations.md # 动作生成范式 (Tokenization vs Diffusion vs Flow)
+│   ├── fast.md                 # FAST 动作 Token 化 (DCT + BPE, 5倍加速)
 │   ├── diffusion_policy.md     # 扩散策略详解 (DDPM, DDIM, EBM)
 │   ├── flash_attention.md      # 性能优化 (Kernel Fusion)
-│   ├── literature_review.md    # 核心文献技术归纳 (RT-2, OpenVLA, Pi0/0.5/0.6, WALL-OSS)
+│   ├── literature_review.md    # 核心文献技术归纳 (包含10个模型对比)
 │   ├── pi0_flow_matching.md    # Pi0 代码解构 (Flow Matching)
 │   ├── pi0_5_dissection.md     # Pi0.5 模型解剖 (Unified Model)
 │   ├── pi0_6_dissection.md     # Pi0.6 模型解剖 (Recap RL)
+│   ├── wall_oss.md             # WALL-OSS 深度解析 (Uni-CoT, X Square Robot)
+│   ├── galaxea_g0.md           # Galaxea G0 双系统 VLA (星海图智能)
+│   ├── knowledge_insulation.md # 知识绝缘技术 (防止灾难性遗忘)
+│   ├── tactile_vla.md          # 触觉感知与 VLA
 │   └── data.md                 # 数据处理 (RLDS, Co-training)
 ├── deployment/                 # 真机与部署
 │   ├── README.md               # 索引
