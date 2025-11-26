@@ -57,19 +57,17 @@ Flash Attention 的核心洞察是：**Transformer 的瓶颈不在计算 (FLOPs)
 
 标准 Softmax 需要两次扫描序列（一次求和，一次归一化）。Flash Attention 使用增量更新：
 
-$$
-\text{softmax}(x)_i = \frac{e^{x_i}}{\sum_{j=1}^{N} e^{x_j}}
-$$
+```
+softmax(x)_i = exp(x_i) / Σ exp(x_j)  (j=1 到 N)
+```
 
-通过维护运行中的 **最大值 $m$** 和 **累积和 $l$**，可以逐块更新：
+通过维护运行中的 **最大值 m** 和 **累积和 l**，可以逐块更新：
 
-$$
-m_{\text{new}} = \max(m_{\text{old}}, m_{\text{block}})
-$$
+```
+m_new = max(m_old, m_block)
 
-$$
-l_{\text{new}} = e^{m_{\text{old}} - m_{\text{new}}} l_{\text{old}} + e^{m_{\text{block}} - m_{\text{new}}} l_{\text{block}}
-$$
+l_new = exp(m_old - m_new) * l_old + exp(m_block - m_new) * l_block
+```
 
 ## 3. 在 VLA 中的应用
 

@@ -82,31 +82,49 @@
     - 实现了 **Data-Driven Self-Improvement**。
 - **Key Contribution**: 证明了机器人可以通过自我复盘 (Recap) 在操作速度和鲁棒性上超越人类专家。
 
-## 7. WALL-OSS (X Square Robot, 2024)
-> **论文**: [WALL-OSS: Igniting VLMs toward the Embodied Space](https://arxiv.org/abs/2408.xxxxx) (需确认 ArXiv ID, 或引用 GitHub)
-> **GitHub**: [X-Square-Robot/wall-x](https://github.com/X-Square-Robot/wall-x)
+## 8. FAST (Physical Intelligence, 2025)
+> **论文**: [FAST: Efficient Action Tokenization for VLA Models (arXiv:2501.09747)](https://arxiv.org/abs/2501.09747)
 
-- **核心问题**: 现有 VLM 缺乏对空间和具身环境的深入理解，且难以进行长序列推理。
-- **核心技术**: **Embodiment-aware VLU** + **Unified Cross-Level Chain-of-Thought (CoT)**。
-- **架构创新**:
-    - **Dual Output Heads**:
-        - **WALL-OSS-FLOW**: 基于 **Flow Matching** 的连续动作生成 (高精度)。
-        - **WALL-OSS-FAST**: 基于 **FAST Tokenizer** 的离散动作生成 (高速度)。
-    - **Unified CoT**: 将指令推理 (Instruction Reasoning)、子目标分解 (Subgoal Decomposition) 和动作合成 (Action Synthesis) 统一在一个可微分的 CoT 过程中。
-- **Data Strategy**: 强调 **Language-Action Association**，通过大规模多模态预训练建立语言与动作的强关联。
-- **Key Contribution**: 提出了一个端到端的具身基础模型，开源了完整的训练/推理代码 (Wall-X)，并展示了在长序列操作任务上的优越性能。
+- **核心问题**: 传统动作 token 化方法（简单分桶）无法处理高频、灵巧的机器人操作。
+- **核心技术**: **Frequency-space Action Sequence Tokenization (DCT + BPE)**。
+- **工作原理**:
+    - **DCT (离散余弦变换)**: 将时域动作序列转换到频域，只保留低频系数（压缩比 2.5:1）。
+    - **BPE (字节对编码)**: 类似 GPT，将常见 DCT 系数组合合并为单个 token（压缩比 2.3:1）。
+- **效果**: 一个 10 步动作序列从 70 个 token 压缩为 **2-3 个 token**。
+- **FAST+**: 在 100 万+真实机器人数据上预训练的通用 tokenizer，跨平台泛化。
+- **Key Contribution**: 使 OpenVLA 训练速度提升 **5 倍**，同时保持高频动作精度。
+
+## 9. Galaxea G0 (星海图智能, 2024)
+> **论文**: [Galaxea Open-World Dataset and G0 Dual-System VLA Model (arXiv:2509.00576)](https://arxiv.org/abs/2509.00576)
+
+- **核心问题**: 单一 VLA 模型难以同时处理长时域任务的高层规划和低层控制。
+- **核心技术**: **Dual-System Architecture (双系统架构)**。
+- **架构设计**:
+    - **G0-VLM**: 负责多模态规划和高层推理（大脑）。
+    - **G0-VLA**: 负责细粒度执行和低层控制（小脑）。
+- **训练策略**: **三阶段课程学习**
+    1. 跨具身预训练（学习通用世界知识）
+    2. 单具身预训练（适配特定机器人）← 核心阶段
+    3. 任务后训练（精调复杂技能）
+- **Galaxea Open-World Dataset**: 500+ 小时，50 个真实场景，统一具身（R1 Lite），精确子任务标注。
+- **Key Contribution**: 在长时域移动操作任务上表现突出，泛化能力强，可解释性高（子任务可见）。
+
+## 10. Knowledge Insulation (Physical Intelligence, 2024)
+> **技术**: Pi0 的梯度隔离训练方法
+
+- **核心问题**: VLA 微调时，新增的连续动作专家会破坏 VLM 的预训练语义知识（灾难性遗忘）。
+- **核心技术**: **Gradient Isolation (梯度隔离)**。
+- **工作原理**:
+    - **VLM 分支**: 学习离散动作 token（保持语义理解）。
+    - **动作专家分支**: 学习连续动作（使用 `.detach()` 阻止梯度回传到 VLM）。
+- **效果**: VLM 的语义知识被"绝缘"保护，同时动作专家独立学习连续控制。
+- **Key Contribution**: 防止灾难性遗忘，加速训练，提升泛化能力，为持续学习打好基础。
 
 ## 总结对比表 (Summary Table)
 
-| 特性 | Diffusion Policy | RT-2 | OpenVLA | Pi0 | Pi0.6 | WALL-OSS |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **核心机制** | Denoising | Token Prediction | Token Prediction | Flow Matching | **Recap (RL)** | **Dual Heads (Flow+FAST)** |
-| **动作空间** | 连续 | 离散 (256) | 离散 (256) | 连续 | 连续 + Expert | **连续 + 离散** |
-| **Backbone** | CNN/ViT | PaLI-X | Llama 2 | PaliGemma 3B | **5B VLM** | **VLM** |
-| **推理速度** | 慢 | 极慢 | 中等 | 快 | **极快 (Expert)** | **快 (FAST) / 精 (Flow)** |
-| **语义能力** | 弱 | 极强 | 强 | 强 | **最强** | **强 (CoT)** |
-| **适用场景** | 精细操作 | 高层规划 | 通用操作 | 通用控制 | **自我进化** | **长序列推理** |
+| 特性 | Diffusion Policy | RT-2 | OpenVLA | Pi0 | WALL-OSS | Galaxea G0 | FAST |\n| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n| **核心机制** | Denoising | Token Prediction | Token + LoRA | Flow Matching | **Uni-CoT + Dual Heads** | **Dual-System** | **DCT + BPE** |\n| **动作空间** | 连续 | 离散 (256) | 离散 (256) | 连续 | 连续 + 离散 | 连续 | **离散 (极度压缩)** |\n| **Backbone** | CNN/ViT | PaLI-X (55B) | Llama 2 (7B) | PaliGemma (3B) | VLM | **VLM + VLA** | **Tokenizer** |\n| **推理速度** | 慢 (100 步) | 极慢 | 中等 | 快 (1-10 步) | 快/精 | 稍慢 (两阶段) | **极快 (5x)** |\n| **语义能力** | 弱 | 极强 | 强 | 强 | **强 (CoT)** | **强 (分离 VLM)** | N/A |\n| **适用场景** | 精细操作 | 高层规划 | 通用操作 | 通用控制 | 长序列推理 | **长时域移动操作** | **高频 Token 化** |\n| **核心优势** | 多模态分布 | 语义涌现 | 开源生态 | 高效推理 | **统一思维链** | **分层解耦** | **压缩效率** |
 
 
 ---
 [← Back to Theory](./README.md)
+
