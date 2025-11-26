@@ -7,7 +7,7 @@
 在 VLA 模型中，动作的表示方式至关重要。传统的离散化方法（如简单分桶）在处理高频、灵巧的机器人操作时效果不佳。FAST 通过**离散余弦变换 (DCT)** 和**字节对编码 (BPE)** 的组合，实现了高效的动作压缩和 token 化。
 
 -   **开发者**: Physical Intelligence
--   **论文**: [FAST: Efficient Action Tokenization for VLA Models](https://arxiv.org/abs/xxxx)
+-   **论文**: [FAST: Efficient Action Tokenization for VLA Models (arXiv:2501.09747)](https://arxiv.org/abs/2501.09747)
 -   **核心目标**: 将连续的机器人动作序列压缩为紧凑的离散 token，同时保持高频动作的精度。
 -   **应用**: 已成功集成到 **OpenVLA** 中，显著提升训练速度（**最高 5 倍加速**）。
 
@@ -86,6 +86,8 @@ FAST 已被集成到 **OpenVLA** 框架中：
 -   **适合自回归模型**: FAST 的 token 输出可以直接喂给 Transformer，无需修改架构。
 
 ## 8. 参考资源
--   **论文**: [FAST Paper on arXiv](https://arxiv.org/abs/xxxx)
--   **GitHub**: [OpenVLA + FAST](https://github.com/openvla/openvla)
--   **Hugging Face**: [FAST+ Tokenizer](https://huggingface.co/)
+-   **论文**: [FAST: Efficient Action Tokenization for VLA Models (arXiv:2501.09747)](https://arxiv.org/abs/2501.09747)
+-   **官方博客**: [Physical Intelligence - FAST](https://physicalintelligence.company/blog/fast)
+-   **GitHub**: [OpenVLA](https://github.com/openvla/openvla)
+-   **Hugging Face**: [FAST+ Tokenizer](https://huggingface.co/pi0/FAST-plus)
+
