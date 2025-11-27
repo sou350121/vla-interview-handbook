@@ -17,6 +17,13 @@
     - 主流格式对比 (RLDS vs LeRobot vs HDF5)。
     - PyTorch 训练流水线与数据加载。
     - 数据收集工具链 (VR vs Leader-Follower)。
+- **[评估体系 (Evaluation Protocols)](./evaluation.md)** [New]
+    - Simulation Benchmarks (CALVIN, SIMPLER)。
+    - 真机评估指标 (Success Rate, Interventions)。
+    - Checkpoint Selection (Loss vs Success Rate)。
+- **[空间智能 (Spatial Intelligence)](./spatial_math.md)** [New]
+    - 坐标系 (Base vs Camera vs End-effector)。
+    - 旋转表示 (Quaternion vs Euler vs 6D Rotation)。
 - **[联合训练 (Co-training)](./co_training.md)**
     - 为什么需要混合互联网数据？(防止灾难性遗忘)。
     - 实施策略：数据配比与 Loss Masking。
