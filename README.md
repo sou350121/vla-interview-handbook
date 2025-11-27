@@ -55,6 +55,7 @@
 │   ├── wall_oss.md             # WALL-OSS 深度解析 (Uni-CoT, X Square Robot)
 │   ├── galaxea_g0.md           # Galaxea G0 双系统 VLA (星海图智能)
 │   ├── knowledge_insulation.md # 知识绝缘技术 (防止灾难性遗忘)
+│   ├── co_training.md          # 联合训练 (Co-training) 详解
 │   ├── tactile_vla.md          # 触觉感知与 VLA
 │   └── data.md                 # 数据处理 (RLDS, Co-training)
 ├── deployment/                 # 真机与部署
