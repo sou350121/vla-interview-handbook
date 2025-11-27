@@ -238,14 +238,95 @@
 
 ## 🎯 总结：面试必杀技
 
+### 📊 基础概念篇
+
 | 问题 | 人话回答 | 装逼回答 |
 |------|---------|---------|
 | **为什么用 Parquet？** | "因为能快速筛选列，PyTorch 友好" | "Column-based format enables selective loading with zero-copy optimization" |
+| **VLA 是什么？** | "能看图、听话、干活的机器人大脑" | "Vision-Language-Action model: multimodal encoder with action decoder" |
+| **VLM Backbone 的作用？** | "负责看懂图和听懂话，像学生的理解能力" | "Encode visual and linguistic inputs into semantic embeddings" |
+| **Action Head 做什么？** | "把理解转成具体动作，像学生的执行力" | "Decode latent representations to continuous or discrete action space" |
+| **Transformer vs CNN？** | "Transformer 是鹰眼，CNN 是近视眼" | "Self-attention enables global receptive field vs CNN's local inductive bias" |
+
+---
+
+### 🎓 数据与训练篇
+
+| 问题 | 人话回答 | 装逼回答 |
+|------|---------|---------|
+| **为什么要联合训练？** | "防止机器人忘记常识（灾难性遗忘）" | "Mitigate catastrophic forgetting via multi-task regularization" |
+| **什么是 Loss Masking？** | "做阅读理解时不算动作分数" | "Selectively backpropagate gradients for task-specific objectives" |
+| **Sim2Real Gap 怎么解决？** | "模拟器加随机化 + 真机数据微调" | "Domain randomization + sim-to-real transfer learning with real-world fine-tuning" |
+| **Checkpoint 怎么选？** | "别只看 Loss，要看真机成功率" | "Prioritize empirical success rate over validation loss on real-world eval" |
+| **数据增强有哪些？** | "随机裁剪、颜色抖动、加噪声" | "Spatial augmentation (crop/flip) + photometric jitter + Gaussian noise injection" |
+
+---
+
+### 🔧 算法与架构篇
+
+| 问题 | 人话回答 | 装逼回答 |
+|------|---------|---------|
+| **Diffusion vs Flow？** | "Flow 像高铁直达，Diffusion 像醉汉走路" | "Flow Matching is deterministic ODE transport, avoiding SDE stochasticity" |
+| **Diffusion Policy 优缺点？** | "能处理多模态，但推理慢（50 步去噪）" | "Handles multimodal distributions but suffers from iterative denoising latency" |
+| **什么是 FAST？** | "用 DCT 把动作压缩成摩尔斯电码" | "Frequency-domain tokenization via DCT for compact action representation" |
+| **Discrete vs Continuous？** | "Discrete 稳但不精细，Continuous 精细但易撞墙" | "Discrete: stable classification but quantization error; Continuous: precise but mode collapse" |
+| **Delta vs Absolute 控制？** | "Delta 像'往前 2 步'，Absolute 像'走到中心'" | "Delta: relative increments with closed-loop feedback; Absolute: target poses with drift risk" |
+
+---
+
+### ⚡ 效率优化篇
+
+| 问题 | 人话回答 | 装逼回答 |
+|------|---------|---------|
+| **LoRA 原理？** | "冻结主干，只训练小插件（低秩矩阵）" | "Low-rank matrix decomposition constrains trainable params to $r \ll d$ subspace" |
+| **为什么量化能加速？** | "INT8 计算比 FP16 快 2 倍，模型小一半" | "Reduced precision arithmetic exploits SIMD/Tensor Core throughput" |
+| **什么是 Flash Attention？** | "把书切小块偷看（Tiling），速度快 3 倍" | "Tiled computation with SRAM reuse reduces HBM memory access bottleneck" |
+| **AWQ 怎么工作？** | "保护重点笔记（重要通道用高精度）" | "Activation-aware per-channel quantization preserves salient weights" |
+| **QLoRA 和 LoRA 区别？** | "QLoRA = LoRA + 量化，1 张卡就能微调大模型" | "QLoRA combines 4-bit quantization with LoRA for memory-efficient fine-tuning" |
+
+---
+
+### 🧠 空间与控制篇
+
+| 问题 | 人话回答 | 装逼回答 |
+|------|---------|---------|
 | **为什么不用欧拉角？** | "会万向节死锁，插值不平滑" | "Gimbal lock induces gradient singularities; quaternion ensures geodesic interpolation" |
-| **为什么要联合训练？** | "防止机器人忘记常识" | "Mitigate catastrophic forgetting via multi-task regularization" |
-| **Diffusion vs Flow？** | "Flow 像高铁，Diffusion 像醉汉" | "Flow Matching is deterministic ODE transport, avoiding SDE stochasticity" |
-| **LoRA 原理？** | "冻结主干，只训练小插件" | "Low-rank matrix decomposition constrains trainable params to $r \ll d$ subspace" |
-| **为什么量化能加速？** | "INT8 计算比 FP16 快 2 倍" | "Reduced precision arithmetic exploits SIMD/Tensor Core throughput" |
+| **四元数的优势？** | "永不卡死，插值平滑" | "No singularities, continuous SO(3) parameterization with slerp interpolation" |
+| **6D Rotation 为什么好？** | "紧凑（6 个数）又稳定（正交化）" | "Overcomplete representation with Gram-Schmidt orthonormalization guarantees valid rotations" |
+| **坐标变换怎么做？** | "用矩阵乘法一层层穿越（Camera → Base → EE）" | "Chain transformation matrices via homogeneous coordinates: $T_{world}^{EE} = T_{world}^{base} \cdot T_{base}^{EE}$" |
+
+---
+
+### 🚀 前沿专题篇
+
+| 问题 | 人话回答 | 装逼回答 |
+|------|---------|---------|
+| **什么是 Knowledge Insulation？** | "保护祖传秘方（VLM 能力不被污染）" | "Isolate task-specific gradients to preserve pre-trained generalization" |
+| **触觉 VLA 的优势？** | "能闭眼夹菜，盲盒操作成功率高 40%" | "Tactile feedback enables contact-rich manipulation with reduced visual occlusion" |
+| **π0 为什么快？** | "用 Flow Matching 瞬发（10 步），不是 Diffusion 慢吞吞（50 步）" | "Flow-based generation requires fewer NFE (10 vs 50) for equivalent action quality" |
+| **RT-1 vs RT-2？** | "RT-1 稳但死板，RT-2 懂常识但慢" | "RT-1: task-specific overfitting; RT-2: VLM transfer but inference latency" |
+| **OpenVLA 的意义？** | "平民英雄，8 张 A100 就能训练" | "Democratizes VLA research via open-source 7B model on commodity hardware" |
+| **WALL-OSS 的特点？** | "边想边做（Uni-CoT），拒绝精神内耗" | "Interleaved reasoning and action tokens via universal chain-of-thought" |
+| **Galaxea G0 的架构？** | "大脑 + 小脑（VLM Policy + RL Policy）" | "Hierarchical dual-policy: high-level planning with low-level motor control" |
+
+---
+
+### 💡 面试技巧
+
+**分层回答策略**：
+1. **第一层（人话版）**: 快速回应，展示理解（"Flow Matching 像坐高铁，直达目的地"）
+2. **第二层（技术版）**: 补充细节，显示深度（"确定性 ODE，避免 SDE 随机性"）
+3. **第三层（追问版）**: 准备公式或代码（如果面试官继续追问）
+
+**示例对话**：
+```
+面试官: "你了解 LoRA 吗？"
+你: "了解！就像只上周末兴趣班，不用重新高考。"
+面试官: "具体说说？"
+你: "LoRA 冻结预训练权重，只训练低秩矩阵 A 和 B，参数量从 7B 降到几百 MB，4GB 显存就能微调。"
+面试官: "数学原理呢？"
+你: "W' = W + ΔW，其中 ΔW = A×B，A 是 d×r，B 是 r×d，r 远小于 d，通常取 8 或 16。"
+```
 
 ---
 
