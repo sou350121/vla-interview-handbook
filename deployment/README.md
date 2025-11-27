@@ -20,7 +20,10 @@
 5. **[模型优化与边缘部署 (Optimization)](./optimization.md)**
     - 量化 (Quantization): GPTQ, AWQ
     - 边缘推理: TensorRT-LLM, vLLM
-6. **[Sim-to-Real (仿真到真机)](./sim_to_real.md)**
+6. **[仿真环境详解 (Simulation Environments)](./simulation_environments.md)** [New]
+    - Isaac Sim vs MuJoCo vs PyBullet
+    - 选型指南: 什么时候用什么？
+7. **[Sim-to-Real (仿真到真机)](./sim_to_real.md)**
     - Domain Randomization
     - Reality Gap 应对策略
 
