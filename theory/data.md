@@ -174,9 +174,45 @@ for batch in dataloader:
 3. **成功率过滤 (Success Filtering)**:
     - 仅使用 `is_terminal=True` 且 `reward=1` 的成功轨迹进行 BC (Behavior Cloning) 训练。
     - 对于失败轨迹，可以用于对比学习 (Contrastive Learning) 或作为负样本。
-4. **Co-training with Web Data**:
-    - 在训练批次 (Batch) 中，固定比例 (e.g., 50%) 混合 VQA (Visual Question Answering) 或 Captioning 数据。
-    - **目的**: 维持 VLM backbone 的视觉语言理解能力，防止过拟合到机器人数据分布上 (Catastrophic Forgetting)。
+### 4.4. 联合训练 (Co-training) [重点]
+
+> **定义**: 在训练 VLA 模型时，同时混合 **机器人动作数据 (Robot Action Data)** 和 **互联网视觉语言数据 (Internet Vision-Language Data)**。
+
+#### 为什么需要 Co-training?
+1.  **防止灾难性遗忘 (Catastrophic Forgetting)**: VLA 模型通常基于预训练的 VLM (如 LLaVA, PaLI) 微调。如果只用机器人数据 (通常只有简单的指令如 "Pick apple") 训练，模型会迅速忘记通用的视觉语义知识 (e.g., 认不出"苹果"是"水果"，或者认不出未见过的物体)。
+2.  **保持通用泛化能力 (Generalization)**: 互联网数据包含了丰富的物体、场景和概念，Co-training 能让机器人利用这些知识处理未见过的指令 (Zero-shot)。
+
+#### 实施策略 (Implementation)
+1.  **数据配比 (Mixing Ratio)**:
+    -   通常采用 **1:1** 或 **1:X** 的比例混合。
+    -   **RT-2**: 机器人数据 : 互联网数据 = 1 : 1 (Batch 内部混合)。
+    -   **OpenVLA**: 机器人数据 (Bridge/DROID) : LLaVA Instruct Data = 50% : 50%。
+2.  **Loss 计算 (Loss Masking)**:
+    -   **机器人数据**: 计算 Action Head 的 Loss (MSE/CE) + (可选) Text Token Loss。
+    -   **互联网数据**: **只计算 Text Token Loss** (Next Token Prediction)，因为这些数据没有动作标签。Action Head 的输出被 Mask 掉，不产生梯度。
+
+#### 代码逻辑 (Pseudo-code)
+```python
+# 在一个 Batch 中混合两种数据
+batch_robot = get_robot_batch() # {image, text, action}
+batch_web = get_web_batch()     # {image, text, action=None}
+
+# 1. Forward Robot Data
+out_robot = model(batch_robot.image, batch_robot.text)
+loss_action = mse_loss(out_robot.pred_action, batch_robot.gt_action)
+
+# 2. Forward Web Data
+out_web = model(batch_web.image, batch_web.text)
+loss_text = cross_entropy(out_web.logits, batch_web.gt_text)
+
+# 3. Combined Loss
+total_loss = loss_action + lambda * loss_text
+total_loss.backward()
+```
+
+#### 案例分析
+-   **RT-2**: 证明了 Co-training 对于保持模型的逻辑推理能力至关重要。如果不加 Web Data，模型在"将可乐罐放到泰勒斯威夫特照片上"这种需要语义理解的任务上成功率会暴跌。
+-   **OpenVLA**: 使用 LLaVA 的微调数据 (COCO, GQA) 进行 Co-training，确保了模型在微调动作控制的同时，依然是一个合格的 VLM (能聊天，能描述图像)。
 
 ## 4. 数据收集工具链 (Data Collection Tools)
 
@@ -213,6 +249,7 @@ for batch in dataloader:
 3.  **数据平衡**: 如果我有 1000 条简单的 Pick-Place 数据和 100 条复杂的 Assembly 数据，应该怎么训练？(答: 重采样 Assembly 数据，提高其在 Batch 中的比例)
 4.  **Action Space**: 为什么要用 Delta Action？(答: 减少对绝对坐标的依赖，更容易迁移到不同位置或不同机器人)
 5.  **数据收集**: 相比于 VR 遥操作，主从臂 (Leader-Follower) 有什么优缺点？(答: 主从臂有力反馈，精度高，但成本高且不仅限于异构机器人映射)
+6.  **Co-training**: 为什么在训练 VLA 时要混合互联网 VQA 数据？(答: 防止灾难性遗忘，保持 VLM Backbone 的通用语义理解和泛化能力)
 
 
 ---
