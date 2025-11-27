@@ -49,8 +49,10 @@
 - **[Flow Matching (π0)](./pi0_flow_matching.md)**: 比 Diffusion 更快、更稳定的生成模型，π0 的核心。
 - **[FAST (Action Tokenization)](./fast.md)**: 基于频率空间 (DCT) 的动作 Tokenization 技术。
 
-### 效率优化
+### 效率优化 (Efficiency)
 - **[Flash Attention](./flash_attention.md)**: 如何解决长序列 Transformer 的计算瓶颈。
+- **[高效微调 (PEFT & LoRA)](./peft_lora.md)** [New]: LoRA / QLoRA 的数学原理，如何用 4GB 显存微调 7B 模型。
+- **[量化理论 (Quantization Theory)](./quantization_theory.md)** [New]: Symmetric vs Asymmetric, Per-Channel vs Per-Tensor, AWQ 原理。
 
 ## 🚀 Part 3: Advanced Topics (进阶专题)
 *解决特定场景下的难题。*
