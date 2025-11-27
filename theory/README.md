@@ -13,23 +13,28 @@
 ## 📚 Part 1: Foundations (基础基石)
 *万丈高楼平地起，数据与动作空间是 VLA 的根基。*
 
+### 1. 数据与空间 (Data & Space)
 - **[数据处理 (Data Processing)](./data.md)**
     - 主流格式对比 (RLDS vs LeRobot vs HDF5)。
     - PyTorch 训练流水线与数据加载。
     - 数据收集工具链 (VR vs Leader-Follower)。
-- **[评估体系 (Evaluation Protocols)](./evaluation.md)** [New]
-    - Simulation Benchmarks (CALVIN, SIMPLER)。
-    - 真机评估指标 (Success Rate, Interventions)。
-    - Checkpoint Selection (Loss vs Success Rate)。
-- **[空间智能 (Spatial Intelligence)](./spatial_math.md)** [New]
+- **[空间智能 (Spatial Intelligence)](./spatial_math.md)**
     - 坐标系 (Base vs Camera vs End-effector)。
     - 旋转表示 (Quaternion vs Euler vs 6D Rotation)。
-- **[联合训练 (Co-training)](./co_training.md)**
-    - 为什么需要混合互联网数据？(防止灾难性遗忘)。
-    - 实施策略：数据配比与 Loss Masking。
+
+### 2. 动作与策略 (Action & Strategy)
 - **[动作空间 (Action Representations)](./action_representations.md)**
     - 连续控制 (Continuous) vs 离散 Token (Discrete)。
     - 相对控制 (Delta) vs 绝对控制 (Absolute)。
+- **[联合训练 (Co-training)](./co_training.md)**
+    - 为什么需要混合互联网数据？(防止灾难性遗忘)。
+    - 实施策略：数据配比与 Loss Masking。
+
+### 3. 评估与迭代 (Evaluation)
+- **[评估体系 (Evaluation Protocols)](./evaluation.md)**
+    - Simulation Benchmarks (CALVIN, SIMPLER)。
+    - 真机评估指标 (Success Rate, Interventions)。
+    - Checkpoint Selection (Loss vs Success Rate)。
 
 ## 🧠 Part 2: Architecture & Algorithms (架构与算法)
 *理解模型是如何"思考"和"决策"的。*
