@@ -2,36 +2,64 @@
 
 本模块涵盖了机器 VLA 算法岗面试所需的核心理论知识，从基础架构到前沿算法。
 
-## 目录
+# VLA 理论与核心算法 (Theory & Algorithms)
 
-### 1. 基础架构 (Foundations)
-构建 VLA 模型的基石，包括骨干网络选择、动作表示和数据处理。
-- **[VLA 核心架构 (VLA Core Architectures)](./vla_arch.md)**: RT-1, RT-2, OpenVLA, WALL-OSS 等主流模型概览。
-- **[Backbone 对比: Transformer vs CNN](./transformer_vs_cnn.md)**: 为什么 ViT 成为主流？ResNet 还有机会吗？
-- **[动作生成范式 (Action Representations)](./action_representations.md)**: Tokenization (离散) vs Diffusion (连续) vs Flow Matching (流匹配)。
-- **[FAST 动作 Token 化](./fast.md)**: DCT + BPE 压缩，5 倍训练加速，OpenVLA 的秘密武器。
-- **[数据处理 (Data Processing)](./data.md)**: RLDS 格式、数据加权与平衡策略。
+本章节深入探讨 Vision-Language-Action (VLA) 模型的理论基础、核心算法以及前沿模型架构。
 
-### 2. 核心算法 (Core Algorithms)
-深入理解驱动 VLA 的数学原理。
-- **[扩散策略详解 (Diffusion Policy)](./diffusion_policy.md)**: DDPM/DDIM, Noise Schedulers, EBM 视角, FiLM Conditioning。
-- **[Pi0 代码解构 (Flow Matching)](./pi0_flow_matching.md)**: Time Embeddings, CFG, OT-CFM, ODE Solvers (Euler/Heun)。
+> **学习建议**: 建议按照以下 **"数据 -> 架构 -> 算法 -> 模型"** 的逻辑顺序进行学习。
 
-### 3. 模型深度解析 (Model Deep Dives)
-针对 Physical Intelligence (Pi) 系列模型的详细拆解。
-- **[Pi0.5 模型解剖 (Unified Model)](./pi0_5_dissection.md)**: 统一高层规划与底层控制，开放世界泛化。
-- [Pi0.6 模型解剖 (Recap RL)](./pi0_6_dissection.md): 引入 Offline RL (Recap) 进行自我进化。
-- **[WALL-OSS 深度解析 (Uni-CoT)](./wall_oss.md)**: 统一跨层思维链 (Uni-CoT) 与流匹配控制 (Flow Matching) 的完美结合。
-- **[Galaxea G0 (双系统 VLA)](./galaxea_g0.md)**: G0-VLM + G0-VLA 分层解耦，长时域移动操作专家。
+---
 
-### 4. 前沿专题 (Advanced Topics)
-面试加分项，展示对最新技术的追踪。
-- **[触觉感知与 VLA (Tactile VLA)](./tactile_vla.md)**: VLA-Touch, OmniVTLA, 视触觉融合技术。
-- **[Flash Attention 优化原理](./flash_attention.md)**: 如何解决 Transformer 的内存瓶颈，实现长序列推理。
-- **[Knowledge Insulation (知识绝缘)](./knowledge_insulation.md)**: Pi0 的梯度隔离技术，防止灾难性遗忘，保护 VLM 语义知识。
+## 📚 Part 1: Foundations (基础基石)
+*万丈高楼平地起，数据与动作空间是 VLA 的根基。*
 
-### 5. 综合综述 (Literature Review)
-- **[核心文献技术归纳](./literature_review.md)**: 汇总了 Diffusion Policy, Pi0, Wall-X 等关键论文的技术细节。
+- **[数据处理 (Data Processing)](./data.md)**
+    - 主流格式对比 (RLDS vs LeRobot vs HDF5)。
+    - PyTorch 训练流水线与数据加载。
+    - 数据收集工具链 (VR vs Leader-Follower)。
+- **[联合训练 (Co-training)](./co_training.md)**
+    - 为什么需要混合互联网数据？(防止灾难性遗忘)。
+    - 实施策略：数据配比与 Loss Masking。
+- **[动作空间 (Action Representations)](./action_representations.md)**
+    - 连续控制 (Continuous) vs 离散 Token (Discrete)。
+    - 相对控制 (Delta) vs 绝对控制 (Absolute)。
+
+## 🧠 Part 2: Architecture & Algorithms (架构与算法)
+*理解模型是如何"思考"和"决策"的。*
+
+### 核心架构
+- **[VLA 架构概览 (VLA Architectures)](./vla_arch.md)**: VLM Backbone + Action Head 的主流设计范式。
+- **[Transformer vs CNN](./transformer_vs_cnn.md)**: 为什么 Transformer 统治了机器人学习？
+
+### 生成策略 (Policy Generation)
+- **[Diffusion Policy](./diffusion_policy.md)**: 基于扩散模型的动作生成，解决多模态分布问题。
+- **[Flow Matching (π0)](./pi0_flow_matching.md)**: 比 Diffusion 更快、更稳定的生成模型，π0 的核心。
+- **[FAST (Action Tokenization)](./fast.md)**: 基于频率空间 (DCT) 的动作 Tokenization 技术。
+
+### 效率优化
+- **[Flash Attention](./flash_attention.md)**: 如何解决长序列 Transformer 的计算瓶颈。
+
+## 🚀 Part 3: Advanced Topics (进阶专题)
+*解决特定场景下的难题。*
+
+- **[知识绝缘 (Knowledge Insulation)](./knowledge_insulation.md)**: 如何在微调时保护 VLM 的通用常识？
+- **[触觉感知 (Tactile VLA)](./tactile_vla.md)**: 引入触觉模态，实现更精细的操作 (e.g., 盲盒摸索)。
+
+## 🦁 Part 4: Model Zoo (模型详解)
+*SOTA 模型的深度剖析与实战案例。*
+
+> **[文献综述 (Literature Review)](./literature_review.md)**: **(必读)** VLA 发展史与主流模型全景图。
+
+- **Physical Intelligence (π0 系列)**
+    - **[π0.5 解析](./pi0_5_dissection.md)**: Flow Matching + VLA 的早期探索。
+    - **[π0.6 解析](./pi0_6_dissection.md)**: 性能更强的迭代版本。
+- **X Square (自变量)**
+    - **[WALL-OSS](./wall_oss.md)**: 基于 Uni-CoT 的通用具身大模型。
+- **Galaxea AI (星海图)**
+    - **[Galaxea G0](./galaxea_g0.md)**: 独特的"小脑+大脑"双系统架构。
+
+---
+[← Back to Root](../README.md)
 
 ## 学习建议
 - **初学者**: 先阅读 **基础架构** 部分，理解 VLA 的基本范式 (Tokenization, Co-fine-tuning)。
